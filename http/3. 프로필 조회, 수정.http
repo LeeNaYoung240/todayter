@@ -1,0 +1,26 @@
+### 3-1. 프로필 조회
+GET http://localhost:8080/api/users/profile
+Content-Type: application/json
+Authorization: {{access_token}}
+
+
+#### 3-2. 닉네임 수정
+PATCH http://localhost:8080/api/users/profiles/nickname
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "nickname" : "두리"
+}
+
+
+#### 3-3. 비밀번호 수정
+PATCH http://localhost:8080/api/users/profiles/password
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "password": "Password2!",
+  "newPassword": "Password1!",
+  "confirmNewPassword": "Password1!"
+}

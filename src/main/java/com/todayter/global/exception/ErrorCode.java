@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-    DUPLICATE_NICKNAME(500, "이미 사용중인 닉네임입니다.");
-    /* DUPLICATE_USERNAME(500, "이미 사용중인 ID입니다."),
+    DUPLICATE_NICKNAME(500, "이미 사용중인 닉네임입니다."),
+     DUPLICATE_USERNAME(500, "이미 사용중인 ID입니다."),
      INVALID_JWT_TOKEN(401, "유효하지 않은 JWT 토큰입니다."),
      USER_NOT_ACTIVE_BLOCK(401, "계정이 차단되었습니다."),
      USER_NOT_ACTIVE_WITHDRAW(401, "계정이 탈퇴되었습니다."),
@@ -22,7 +22,7 @@ public enum ErrorCode {
      CONFIRM_NEW_PASSWORD_NOT_MATCH(500, "새로운 비밀번호가 서로 일치하지 않습니다."),
      NEW_PASSWORD_CANNOT_BE_SAME_AS_OLD(500,"새 비밀번호는 현재 비밀번호와 같을 수 없습니다."),
      ;
- */
+
     private int status;
     private String message;
 
