@@ -5,6 +5,7 @@ import com.todayter.global.jwt.JwtProvider;
 import com.todayter.global.security.JwtAuthenticationFilter;
 import com.todayter.global.security.JwtAuthorizationFilter;
 import com.todayter.global.security.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,10 +68,20 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login", "/", "/api/users/signup").permitAll()
                         .requestMatchers("/api/users/check-nickname").permitAll()
                         .requestMatchers("/api/users/check-username").permitAll()
+                        .requestMatchers("/login/oauth2/code/**").permitAll()
+                        .requestMatchers( "/api/users/oauth/naver/callback", "/api/users/login/oauth2/code/google", "/api/users/login/oauth2/code/kakao").permitAll()
+                        .requestMatchers("/oauth2/authorization/**").permitAll()
+
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .oauth2Login(oauth2 -> oauth2
+                                .defaultSuccessUrl("/")
+                                        .failureHandler((request, response, exception) -> {
+                                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                            response.getWriter().write("소셜 로그인 실패");
+                                        }));
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
@@ -83,7 +94,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:8080");
+       // configuration.addAllowedOrigin("http://localhost:8081");
+        configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");

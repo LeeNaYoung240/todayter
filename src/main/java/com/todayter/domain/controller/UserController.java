@@ -1,6 +1,10 @@
 package com.todayter.domain.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.todayter.domain.dto.*;
+import com.todayter.domain.service.GoogleService;
+import com.todayter.domain.service.KakaoService;
+import com.todayter.domain.service.NaverService;
 import com.todayter.domain.service.UserService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
@@ -13,12 +17,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
+    private final KakaoService kakaoService;
+    private final NaverService naverService;
+    private final GoogleService googleService;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto> signup(@RequestBody SignupRequestDto signupDto) {
@@ -93,7 +103,29 @@ public class UserController {
 
         userService.withdrawUser(userDetails.getUser(), withDrawDto.getPassword());
 
-        return ResponseEntity.ok(new CommonResponseDto(200, "회원 탈되 되었습니다. 😭", null));
+        return ResponseEntity.ok(new CommonResponseDto(200, "회원 탈퇴 되었습니다. 😭", null));
 
     }
+
+    @GetMapping("/login/oauth2/code/kakao")
+    public ResponseEntity<CommonResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+        List<String> kakaoToken = kakaoService.kakaoLogin(code, response);
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "카카오 로그인 성공", kakaoToken));
+    }
+
+    @GetMapping("/oauth/naver/callback")
+    public ResponseEntity<CommonResponseDto> naverLogin(@RequestParam String code,
+                                      @RequestParam String state,
+                                      HttpServletResponse response) throws JsonProcessingException {
+        List<String> naverToken = naverService.naverLogin(code, state, response);
+        return ResponseEntity.ok(new CommonResponseDto(200, "네이버 로그인 성공", naverToken));
+    }
+
+    @GetMapping("/login/oauth2/code/google")
+    public ResponseEntity<CommonResponseDto> googleLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+        List<String> googleToken = googleService.googleLogin(code, response);
+        return ResponseEntity.ok(new CommonResponseDto(200, "구글 로그인 성공", googleToken));
+    }
+
 }

@@ -26,7 +26,16 @@ public class UserEntity extends TimeStamped {
     private String nickname;
 
     @Column
+    private String loginId;
+
+    @Column
     private String refreshToken;
+
+    @Column
+    private String socialId;
+
+    @Column(nullable = false)
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,6 +50,17 @@ public class UserEntity extends TimeStamped {
         this.nickname = dto.getNickname();
         this.status = status;
         this.role = role;
+    }
+
+    public UserEntity(String email, String encodedPassword, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum, String socialId, String loginId) {
+        this.username = email;
+        this.password = encodedPassword;
+        this.nickname = nickname;
+        this.email = email;
+        this.status = userStatusEnum;
+        this.role = userRoleEnum;
+        this.socialId = socialId;
+        this.loginId = loginId;
     }
 
     public void encryptionPassword(String password) {
@@ -62,4 +82,14 @@ public class UserEntity extends TimeStamped {
     public void updateStatus(UserStatusEnum status) {
         this.status = status;
     }
+
+    public UserEntity socialIdUpdate(String socialId) {
+        this.socialId = socialId;
+        return this;
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
 }
