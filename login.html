@@ -1,0 +1,24 @@
+<!-- login-test.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>소셜 로그인 테스트</title>
+</head>
+<body>
+<h2>소셜 로그인</h2>
+
+<a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=585441266753-jefhbc4efklmrkicqoto45tfdpdaopgf.apps.googleusercontent.com&redirect_uri=http://localhost:8081/api/users/login/oauth2/code/google&response_type=code&scope=profile%20email&access_type=offline">
+    구글 로그인
+</a><br/>
+
+<a href="https://kauth.kakao.com/oauth/authorize?client_id=82500758cadc943bdea9d0e5e2551b44&redirect_uri=http://localhost:8081/api/users/login/oauth2/code/kakao&response_type=code">
+    카카오 로그인
+</a><br/>
+
+<a href="https://nid.naver.com/oauth2.0/authorize?client_id=bciih36BwQ72JM9XYi5q&redirect_uri=http://localhost:8081/api/users/oauth/naver/callback&response_type=code&state=test">
+    네이버 로그인
+</a><br/>
+
+</body>
+</html>
