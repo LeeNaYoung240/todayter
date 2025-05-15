@@ -21,15 +21,20 @@ spring:
           google:
             client-id: ${SOCIAL_GOOGLE_CLIENT_ID}
             client-secret: ${SOCIAL_GOOGLE_CLIENT_SECRET}
-            scope: profile, email
-            redirect-uri: http://localhost:8081/api/users/login/oauth2/code/google
+            scope:
+              - profile
+              - email
+            redirect-uri: ${SOCIAL_GOOGLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
             client-name: Google
           naver:
             client-id: ${SOCIAL_NAVER_CLIENT_ID}
             client-secret: ${SOCIAL_NAVER_CLIENT_SECRET}
+            scope:
+             - profile
+             - email
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/api/users/oauth/naver/callback
+            redirect-uri: ${SOCIAL_NAVER_REDIRECT_URI}
             client-name: Naver
           kakao:
             client-id: ${SOCIAL_KAKAO_CLIENT_ID}
@@ -38,7 +43,7 @@ spring:
             authorization-grant-type: authorization_code
             scope:
               - account_email
-            redirect-uri: http://localhost:8081/api/users/login/oauth2/code/kakao
+            redirect-uri: ${SOCIAL_GOOGLE_REDIRECT_URI}
             client-name: Kakao
             provider: kakao
         provider:
@@ -52,7 +57,7 @@ spring:
             authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: id
+            user-name-attribute: sub
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize
             token-uri: https://nid.naver.com/oauth2.0/token
