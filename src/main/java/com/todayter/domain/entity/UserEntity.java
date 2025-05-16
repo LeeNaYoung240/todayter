@@ -46,6 +46,7 @@ public class UserEntity extends TimeStamped {
     private UserStatusEnum status;
 
     public UserEntity(SignupRequestDto dto, UserStatusEnum status, UserRoleEnum role) {
+        this.email = dto.getEmail();
         this.username = dto.getUsername();
         this.nickname = dto.getNickname();
         this.status = status;

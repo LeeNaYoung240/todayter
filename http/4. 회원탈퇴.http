@@ -1,5 +1,5 @@
 #### 4. 회원탈퇴
-PATCH http://localhost:8080/api/users/withdraw
+PATCH http://localhost:8081/api/users/withdraw
 Content-Type: application/json
 Authorization: {{access_token}}
 

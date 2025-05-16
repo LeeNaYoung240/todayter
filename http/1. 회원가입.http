@@ -1,16 +1,17 @@
 ### 1-1-1. 회원가입 - USER_1
-POST http://localhost:8080/api/users/signup
+POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
   "username" : "username1",
   "password" : "Password1!",
   "nickname" : "영나이",
+  "email" : "dlskdud12@naver.com",
   "isAdmin" : false
 }
 
 ### 1-1-2. 회원가입 - USER_2
-POST http://localhost:8080/api/users/signup
+POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
@@ -21,7 +22,7 @@ Content-Type: application/json
 }
 
 ### 1-2. 회원가입 - ADMIN
-POST http://localhost:8080/api/users/signup
+POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
@@ -34,9 +35,9 @@ Content-Type: application/json
 }
 
 ### 1-3-1. 아이디 중복확인 (이미 해당 아이디 존재 시 true 반환)
-GET http://localhost:8080/api/users/check-username?username=username1
+GET http://localhost:8081/api/users/check-username?username=username1
 Content-Type: application/json
 
 ### 1-3-2. 닉네임 중복확인 (이미 해당 닉네임 존재 시 true 반환)
-GET http://localhost:8080/api/users/check-nickname?nickname=영나이
+GET http://localhost:8081/api/users/check-nickname?nickname=영나이
 Content-Type: application/json

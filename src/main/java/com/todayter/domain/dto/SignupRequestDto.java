@@ -1,5 +1,6 @@
 package com.todayter.domain.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,10 @@ public class SignupRequestDto {
     @Size(min = 8, max = 15, message = "비밀번호는 8자 이상, 15자 이하여야 합니다.")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])\\S{10,}$", message = "password는 알파벳 대소문자(a~z, A~Z), 숫자(0~9), 특수문자로만 구성되어야 합니다.")
     private String password;
+
+    @NotBlank(message = "email은 비워둘 수 없습니다.")
+    @Email(message = "이메일 형식으로 입력해 주세요.")
+    private String email;
 
     @NotBlank(message = " nickname은 비워둘 수 없습니다.")
     private String nickname;
