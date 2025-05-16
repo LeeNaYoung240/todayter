@@ -1,4 +1,4 @@
-package com.todayter.domain.controller;
+package com.todayter.domain.user.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -20,7 +20,7 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "password": "Password1!",
-  "newPassword": "Password2!",
-  "confirmNewPassword": "Password2!"
+  "password": "Password2!",
+  "newPassword": "Password1!",
+  "confirmNewPassword": "Password1!"
 }

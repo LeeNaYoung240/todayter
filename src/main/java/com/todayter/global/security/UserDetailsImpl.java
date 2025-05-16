@@ -1,8 +1,8 @@
 package com.todayter.global.security;
 
-import com.todayter.domain.entity.UserEntity;
-import com.todayter.domain.entity.UserRoleEnum;
-import com.todayter.domain.entity.UserStatusEnum;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserStatusEnum;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,12 +1,12 @@
 package com.todayter.global.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.todayter.domain.dto.LoginRequestDto;
-import com.todayter.domain.dto.LoginResponseDto;
-import com.todayter.domain.entity.UserEntity;
-import com.todayter.domain.entity.UserRoleEnum;
-import com.todayter.domain.entity.UserStatusEnum;
-import com.todayter.domain.repository.UserRepository;
+import com.todayter.domain.user.dto.LoginRequestDto;
+import com.todayter.domain.user.dto.LoginResponseDto;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserStatusEnum;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;

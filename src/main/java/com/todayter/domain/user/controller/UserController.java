@@ -1,11 +1,12 @@
-package com.todayter.domain.controller;
+package com.todayter.domain.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.todayter.domain.dto.*;
-import com.todayter.domain.service.GoogleService;
-import com.todayter.domain.service.KakaoService;
-import com.todayter.domain.service.NaverService;
-import com.todayter.domain.service.UserService;
+import com.todayter.domain.user.dto.*;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.service.GoogleService;
+import com.todayter.domain.user.service.KakaoService;
+import com.todayter.domain.user.service.NaverService;
+import com.todayter.domain.user.service.UserService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -106,6 +107,16 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponseDto(200, "회원 탈퇴 되었습니다. 😭", null));
 
     }
+
+    @PatchMapping("{userId}/block")
+    public ResponseEntity<CommonResponseDto> withdrawalUser(@PathVariable Long userId,
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserEntity user = userDetails.getUser();
+        userService.blockUser(userId, user);
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "회원 차단에 성공하였습니다. 🎉", null));
+    }
+
 
     @GetMapping("/login/oauth2/code/kakao")
     public ResponseEntity<CommonResponseDto> kakaoLogin(@RequestParam String code,

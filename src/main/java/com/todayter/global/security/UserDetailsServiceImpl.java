@@ -1,8 +1,8 @@
 package com.todayter.global.security;
 
-import com.todayter.domain.entity.UserEntity;
-import com.todayter.domain.entity.UserStatusEnum;
-import com.todayter.domain.repository.UserRepository;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserStatusEnum;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import org.springframework.security.core.userdetails.UserDetails;

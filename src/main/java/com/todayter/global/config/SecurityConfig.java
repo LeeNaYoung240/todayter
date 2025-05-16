@@ -1,6 +1,6 @@
-package com.todayter.domain.config;
+package com.todayter.global.config;
 
-import com.todayter.domain.repository.UserRepository;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.jwt.JwtProvider;
 import com.todayter.global.security.JwtAuthenticationFilter;
 import com.todayter.global.security.JwtAuthorizationFilter;
@@ -78,6 +78,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/users/*/block").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

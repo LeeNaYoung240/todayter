@@ -1,4 +1,4 @@
-package com.todayter.domain.config;
+package com.todayter.global.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

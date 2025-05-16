@@ -1,0 +1,13 @@
+#### 4-1-1. 회원탈퇴
+PATCH http://localhost:8081/api/users/withdraw
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "password": "Password1!"
+}
+
+#### 4-1-2. 회원차단
+PATCH http://localhost:8081/api/users/1/block
+Content-Type: application/json
+Authorization: {{access_token}}

@@ -1,4 +1,4 @@
-package com.todayter.domain.entity;
+package com.todayter.domain.user.entity;
 
 public enum UserRoleEnum {
 

@@ -1,6 +1,6 @@
-package com.todayter.domain.dto;
+package com.todayter.domain.user.dto;
 
-import com.todayter.domain.entity.UserEntity;
+import com.todayter.domain.user.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

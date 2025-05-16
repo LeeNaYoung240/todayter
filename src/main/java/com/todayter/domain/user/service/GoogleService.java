@@ -1,13 +1,13 @@
-package com.todayter.domain.service;
+package com.todayter.domain.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.todayter.domain.dto.GoogleUserInfoDto;
-import com.todayter.domain.entity.UserEntity;
-import com.todayter.domain.entity.UserRoleEnum;
-import com.todayter.domain.entity.UserStatusEnum;
-import com.todayter.domain.repository.UserRepository;
+import com.todayter.domain.user.dto.GoogleUserInfoDto;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserStatusEnum;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

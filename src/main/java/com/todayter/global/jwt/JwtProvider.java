@@ -1,7 +1,7 @@
 package com.todayter.global.jwt;
 
 
-import com.todayter.domain.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import io.jsonwebtoken.Claims;

@@ -1,7 +1,7 @@
-package com.todayter.domain.dto;
+package com.todayter.domain.user.dto;
 
-import com.todayter.domain.entity.UserRoleEnum;
-import com.todayter.domain.entity.UserStatusEnum;
+import com.todayter.domain.user.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserStatusEnum;
 import lombok.Getter;
 
 @Getter

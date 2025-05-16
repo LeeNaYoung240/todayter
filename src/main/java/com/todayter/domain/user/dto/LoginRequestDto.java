@@ -1,4 +1,4 @@
-package com.todayter.domain.dto;
+package com.todayter.domain.user.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -1,0 +1,9 @@
+#### 5. 게시글 등록
+POST http://localhost:8081/api/boards
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "title" : "금세",
+  "content" : "바보"
+}
