@@ -108,7 +108,8 @@ public class UserController {
     }
 
     @GetMapping("/login/oauth2/code/kakao")
-    public ResponseEntity<CommonResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+    public ResponseEntity<CommonResponseDto> kakaoLogin(@RequestParam String code,
+                                                        HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
         List<String> kakaoToken = kakaoService.kakaoLogin(code, response);
 
         return ResponseEntity.ok(new CommonResponseDto(200, "카카오 로그인 성공", kakaoToken));
@@ -116,14 +117,15 @@ public class UserController {
 
     @GetMapping("/oauth/naver/callback")
     public ResponseEntity<CommonResponseDto> naverLogin(@RequestParam String code,
-                                      @RequestParam String state,
-                                      HttpServletResponse response) throws JsonProcessingException {
+                                                        @RequestParam String state,
+                                                         HttpServletResponse response) throws JsonProcessingException {
         List<String> naverToken = naverService.naverLogin(code, state, response);
         return ResponseEntity.ok(new CommonResponseDto(200, "네이버 로그인 성공", naverToken));
     }
 
     @GetMapping("/login/oauth2/code/google")
-    public ResponseEntity<CommonResponseDto> googleLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+    public ResponseEntity<CommonResponseDto> googleLogin(@RequestParam String code,
+                                                         HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
         List<String> googleToken = googleService.googleLogin(code, response);
         return ResponseEntity.ok(new CommonResponseDto(200, "구글 로그인 성공", googleToken));
     }

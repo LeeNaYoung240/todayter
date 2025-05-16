@@ -141,8 +141,10 @@ public class GoogleService {
                 String encodedPassword = passwordEncoder.encode(password);
                 String loginId = UUID.randomUUID().toString();  // 임시 로그인 ID
                 String email = googleUserInfo.getEmail();
+                String nickname = googleUserInfo.getNickname();
 
-                googleUser = new UserEntity(email, encodedPassword, googleUserInfo.getName(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
+
+                googleUser = new UserEntity(nickname ,email, encodedPassword, googleUserInfo.getNickname(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
             }
         }
 

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 public class GoogleUserInfoDto {
 
     private String id;
-    private String name;
+    private String nickname;
     private String email;
 
-    public GoogleUserInfoDto(String id, String name, String email) {
+    public GoogleUserInfoDto(String id, String nickname, String email) {
         this.id = id;
-        this.name = name;
+        this.nickname = nickname;
         this.email = email;
     }
 }

@@ -67,7 +67,7 @@ public class KakaoService {
         return res;
     }
 
-    // Access Token 발급받는 메서드
+    // 카카오 서버에 인가코들르 보내고 Access Token 발급받는 메서드
     private String getToken(String code) throws JsonProcessingException {
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kauth.kakao.com")
@@ -76,30 +76,36 @@ public class KakaoService {
                 .build()
                 .toUri();
 
+        // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
+        // 요청 body 설정
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoClientId);
         body.add("redirect_uri", kakaoRedirectUri);
         body.add("code", code);
 
+        // POST 요청 구성
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
                 .post(uri)
                 .headers(headers)
                 .body(body);
 
+        // 요청 보내기
         ResponseEntity<String> response = restTemplate.exchange(
                 requestEntity,
                 String.class
         );
+        // 응답 JSON 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
 
+        // access_token 추출해서 반환
         return jsonNode.get("access_token").asText();
     }
 
-    // 카카오 사용자 정보 조회 메서드
+    // access token을 이용해 카카오 사용자 정보 요청
     private KaKaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kapi.kakao.com")
@@ -108,10 +114,12 @@ public class KakaoService {
                 .build()
                 .toUri();
 
+        // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
+        // POST 요청 전송 (body는 비워도 됨)
         RequestEntity<MultiValueMap<String, String>> requestEntity = RequestEntity
                 .post(uri)
                 .headers(headers)
@@ -125,6 +133,7 @@ public class KakaoService {
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
         //log.info("카카오 로그인 응답: {}", jsonNode.toPrettyString());
 
+        // 사용자 정보 추출
         String socialId = jsonNode.has("id") ? jsonNode.get("id").asText() : null;
         String nickname = null;
         JsonNode propertiesNode = jsonNode.get("properties");
@@ -149,22 +158,26 @@ public class KakaoService {
 
     // 카카오 사용자 등록 또는 로그인
     private UserEntity registerKakaoUserIfNeeded(KaKaoUserInfoDto kakaoUserInfo) {
-        String socialId = kakaoUserInfo.getId();  // 카카오 ID를 socialId로 받기
-        UserEntity kakaoUser = userRepository.findBySocialId(socialId).orElse(null);  // socialId로 검색
+        String socialId = kakaoUserInfo.getId();
+        // 기존 유저인지 확인
+        UserEntity kakaoUser = userRepository.findBySocialId(socialId).orElse(null);
 
         if (kakaoUser == null) {
+            // 같은 이메일을 가진 유저가 있을 경우 기존 유저로 등록
             String kakaoEmail = kakaoUserInfo.getEmail();
             UserEntity sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
             if (sameEmailUser != null) {
                 kakaoUser = sameEmailUser;
                 kakaoUser = kakaoUser.socialIdUpdate(socialId);  // socialId 업데이트
             } else {
+                // 새로운 사용자라면 회원가입
+                String nickname = kakaoUserInfo.getNickname();
                 String password = UUID.randomUUID().toString();  // 임시 비밀번호
                 String encodedPassword = passwordEncoder.encode(password);
                 String loginId = UUID.randomUUID().toString();  // 임시 로그인 ID
                 String email = kakaoUserInfo.getEmail();
 
-                kakaoUser = new UserEntity(email, encodedPassword, kakaoUserInfo.getNickname(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
+                kakaoUser = new UserEntity(nickname, email, encodedPassword, kakaoUserInfo.getNickname(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
             }
         }
 

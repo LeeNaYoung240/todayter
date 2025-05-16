@@ -109,8 +109,11 @@ public class NaverService {
                 String randomPwd = UUID.randomUUID().toString();
                 String encodedPwd = passwordEncoder.encode(randomPwd);
                 String loginId = UUID.randomUUID().toString();
+                String nickname = userInfo.getNickname();
+
 
                 user = new UserEntity(
+                        nickname,
                         email,
                         encodedPwd,
                         userInfo.getNickname(),
