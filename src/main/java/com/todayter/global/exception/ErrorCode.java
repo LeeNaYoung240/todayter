@@ -7,7 +7,9 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-    DUPLICATE_NICKNAME(500, "이미 사용중인 닉네임입니다."),
+     NOT_BLOCK(500,"차단 권한이 없습니다."),
+     ALREADY_BLOCK(500,"이미 차단된 사용자입니다."),
+     DUPLICATE_NICKNAME(500, "이미 사용중인 닉네임입니다."),
      DUPLICATE_USERNAME(500, "이미 사용중인 ID입니다."),
      INVALID_JWT_TOKEN(401, "유효하지 않은 JWT 토큰입니다."),
      USER_NOT_ACTIVE_BLOCK(401, "계정이 차단되었습니다."),

@@ -1,12 +1,12 @@
-package com.todayter.domain.service;
+package com.todayter.domain.user.service;
 
-import com.todayter.domain.dto.EditPasswordRequestDto;
-import com.todayter.domain.dto.ProfileResponseDto;
-import com.todayter.domain.dto.SignupRequestDto;
-import com.todayter.domain.entity.UserEntity;
-import com.todayter.domain.entity.UserRoleEnum;
-import com.todayter.domain.entity.UserStatusEnum;
-import com.todayter.domain.repository.UserRepository;
+import com.todayter.domain.user.dto.EditPasswordRequestDto;
+import com.todayter.domain.user.dto.ProfileResponseDto;
+import com.todayter.domain.user.dto.SignupRequestDto;
+import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserRoleEnum;
+import com.todayter.domain.user.entity.UserStatusEnum;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import com.todayter.global.jwt.JwtProvider;
@@ -31,15 +31,15 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public void signup(SignupRequestDto signupDto){
+    public void signup(SignupRequestDto signupDto) {
 
-        if(isUserNameExist(signupDto.getUsername())) {
+        if (isUserNameExist(signupDto.getUsername())) {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }
 
         UserRoleEnum userRole = UserRoleEnum.USER;
-        if(!signupDto.getAdminToken().isEmpty()) {
-            if(!ADMIN_TOKEN.equals(signupDto.getAdminToken())) {
+        if (!signupDto.getAdminToken().isEmpty()) {
+            if (!ADMIN_TOKEN.equals(signupDto.getAdminToken())) {
                 throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
             }
             userRole = userRole.ADMIN;
@@ -64,7 +64,7 @@ public class UserService {
 
         UserEntity user = userRepository.findByNickname(nickname).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if(!jwtProvider.validateRefreshToken(user.getRefreshToken())) {
+        if (!jwtProvider.validateRefreshToken(user.getRefreshToken())) {
             throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_VALIDATE);
         }
 
@@ -84,7 +84,7 @@ public class UserService {
     @Transactional
     public ProfileResponseDto updateNickname(UserEntity user, String nickname) {
 
-        if(isNicknameExist(nickname)) {
+        if (isNicknameExist(nickname)) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
@@ -96,15 +96,15 @@ public class UserService {
 
     public void updatePassword(UserEntity user, EditPasswordRequestDto editPasswordRequestDto) {
 
-        if(!bCryptPasswordEncoder.matches(editPasswordRequestDto.getPassword(), user.getPassword())){
+        if (!bCryptPasswordEncoder.matches(editPasswordRequestDto.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
 
-        if(!editPasswordRequestDto.getNewPassword().equals(editPasswordRequestDto.getConfirmNewPassword())) {
+        if (!editPasswordRequestDto.getNewPassword().equals(editPasswordRequestDto.getConfirmNewPassword())) {
             throw new CustomException(ErrorCode.CONFIRM_NEW_PASSWORD_NOT_MATCH);
         }
 
-        if(editPasswordRequestDto.getNewPassword().equals(editPasswordRequestDto.getPassword())) {
+        if (editPasswordRequestDto.getNewPassword().equals(editPasswordRequestDto.getPassword())) {
             throw new CustomException(ErrorCode.NEW_PASSWORD_CANNOT_BE_SAME_AS_OLD);
         }
 
@@ -117,7 +117,7 @@ public class UserService {
     @Transactional
     public void withdrawUser(UserEntity user, String password) {
 
-        if(!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
 
@@ -143,4 +143,25 @@ public class UserService {
         return userRepository.existsByNickname(nickname);
     }
 
+    @Transactional
+    public void blockUser(Long userId, UserEntity userDetails) {
+        UserEntity userToBlock = getUserById(userId);
+
+        if (!userDetails.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new CustomException(ErrorCode.NOT_BLOCK);
+        }
+
+        if (userToBlock.isBlock()) {
+            throw new CustomException(ErrorCode.ALREADY_BLOCK);
+        }
+
+        userToBlock.updateStatus(UserStatusEnum.BLOCK);
+    }
+
+    private UserEntity getUserById(Long userId) {
+
+        return userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+    }
 }

@@ -1,6 +1,6 @@
-package com.todayter.domain.entity;
+package com.todayter.domain.user.entity;
 
-import com.todayter.domain.dto.SignupRequestDto;
+import com.todayter.domain.user.dto.SignupRequestDto;
 import com.todayter.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -93,4 +93,7 @@ public class UserEntity extends TimeStamped {
         return loginId;
     }
 
+    public boolean isBlock() {
+        return this.status == UserStatusEnum.BLOCK;
+    }
 }
