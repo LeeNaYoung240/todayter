@@ -32,12 +32,27 @@ public class Board extends TimeStamped {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @Column(nullable = true)
+    private String region;
+
+    @Column
+    private String section;
+
+    @Column(nullable = false)
+    private String category;
+
+    @Column(nullable = true)
+    private Boolean pick;
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @Builder
-    public Board(String title, String contents, BoardType type)
-    {
+    public Board(String title, String contents, BoardType type) {
         this.title = title;
         this.contents = contents;
-        this. type = type;
+        this.type = type;
     }
 
     public Board(UserEntity user, BoardRequestDto requestDto, BoardType type) {
@@ -45,6 +60,15 @@ public class Board extends TimeStamped {
         this.contents = requestDto.getContent();
         this.user = user;
         this.type = type;
+        this.category = requestDto.getCategory();
+
+        setCategory(requestDto.getCategory());
+
+        if (type == BoardType.LOCAL) {
+            this.region = requestDto.getRegion();
+        } else if (type == BoardType.SECTION) {
+            this.section = requestDto.getSection();
+        }
     }
 
     public void updateTitle(String title) {
@@ -59,7 +83,6 @@ public class Board extends TimeStamped {
         this.type = type;
     }
 
-
     public enum BoardType {
         NORMAL, // 일반
         LOCAL, // 지역별
@@ -68,4 +91,13 @@ public class Board extends TimeStamped {
         NOTICE, // 공지
         PICK // 픽
     }
+
+    public void setPick(boolean pick) {
+        this.pick = pick;
+    }
+
+    public boolean isPick() {
+        return pick;
+    }
+
 }

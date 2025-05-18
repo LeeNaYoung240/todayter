@@ -1,9 +1,51 @@
-#### 5. 게시글 등록
+#### 5-1-1. 게시글 등록(지역별)
 POST http://localhost:8081/api/boards
 Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "title" : "금세",
-  "content" : "바보"
+  "title" : "금세 바보 테스트1",
+  "content" : "🍖",
+  "category": "지역별",
+  "region": "익산"
 }
+
+#### 5-1-2. 게시글 등록(분야별)
+POST http://localhost:8081/api/boards
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "title" : "금세 바보 테스트2",
+  "content" : "🍖",
+  "category": "분야별",
+  "section": "정치"
+}
+
+#### 5-2. 게시글 조회
+GET http://localhost:8081/api/boards/3
+
+#### 5-3-1. 게시글 섹션별 조회 (지역별)
+GET http://localhost:8081/api/boards/section?page=1&sortBy=createdAt&sectionType=지역별&sectionName=익산
+
+#### 5-3-2. 게시글 섹션별 조회 (분야별)
+GET http://localhost:8081/api/boards/section?page=1&sortBy=createdAt&sectionType=분야별&sectionName=정치
+
+#### 5-4-1. 전체 게시글 조회
+GET http://localhost:8081/api/boards/section?page=1&sortBy=createdAt&sectionType=ALL
+
+#### 5-4-2. PICK 게시글 조회
+GET http://localhost:8081/api/boards/pick?page=1&sortBy=createdAt
+
+#### 5-4-3. 제목형 게시글 조회
+GET http://localhost:8081/api/boards/titles?page=1&sortBy=createdAt
+
+#### 5-4-4. 요약형 게시글 조회
+GET http://localhost:8081/api/boards/summaries?page=1&sortBy=createdAt
+
+#### 5-5. 게시글 PICK 지정
+PATCH http://localhost:8081/api/boards/14/pick?pick=true
+Content-Type: application/json
+Authorization: {{access_token}}
+
+

@@ -16,4 +16,10 @@ public class BoardRequestDto {
     @Size(max = 10000, message = "내용은 최대 10,000자까지 입력 가능합니다.")
     private String content;
 
+    private String region;
+
+    private String category;
+
+    private String section;
+
 }

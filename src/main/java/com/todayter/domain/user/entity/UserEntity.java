@@ -96,4 +96,9 @@ public class UserEntity extends TimeStamped {
     public boolean isBlock() {
         return this.status == UserStatusEnum.BLOCK;
     }
+
+    public boolean hasRole(String role) {
+        return this.role != null && this.role.getAuthority().equals(role);
+    }
+
 }
