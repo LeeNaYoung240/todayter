@@ -43,7 +43,7 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public BoardResponseDto getBoard(Long boardId) {
         Board board = findById(boardId);
 

@@ -30,6 +30,10 @@ public enum ErrorCode {
     SORT_NOT_FOUND(404, "찾을 수 없는 정렬입니다."),
     SECTION_TYPE_NOT_FOUND(404, "섹션 타입을 찾을 수 없습니다."),
     UNAUTHORIZED(404, "권환이 없습니다."),
+
+    // Redis 관련 오류 처리
+    REDIS_NOT_CONNECT(500, "레디스 서버에 연결할 수 없습니다."),
+    VERIFY_NOT_ALLOWED(400, "인증 요청이 잘못 되었습니다."),
     ;
 
     private int status;

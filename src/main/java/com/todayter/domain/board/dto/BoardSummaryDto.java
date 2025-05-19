@@ -20,4 +20,5 @@ public class BoardSummaryDto {
         this.nickname = nickname;
         this.createdAt = createdAt;
     }
+
 }

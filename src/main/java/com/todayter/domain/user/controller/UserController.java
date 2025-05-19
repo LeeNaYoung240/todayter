@@ -3,12 +3,11 @@ package com.todayter.domain.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.todayter.domain.user.dto.*;
 import com.todayter.domain.user.entity.UserEntity;
-import com.todayter.domain.user.service.GoogleService;
-import com.todayter.domain.user.service.KakaoService;
-import com.todayter.domain.user.service.NaverService;
-import com.todayter.domain.user.service.UserService;
+import com.todayter.domain.user.service.*;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
+import io.netty.handler.codec.MessageAggregationException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Controller
@@ -30,6 +31,7 @@ public class UserController {
     private final KakaoService kakaoService;
     private final NaverService naverService;
     private final GoogleService googleService;
+    private final EmailService emailService;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto> signup(@RequestBody SignupRequestDto signupDto) {
@@ -129,7 +131,7 @@ public class UserController {
     @GetMapping("/oauth/naver/callback")
     public ResponseEntity<CommonResponseDto> naverLogin(@RequestParam String code,
                                                         @RequestParam String state,
-                                                         HttpServletResponse response) throws JsonProcessingException {
+                                                        HttpServletResponse response) throws JsonProcessingException {
         List<String> naverToken = naverService.naverLogin(code, state, response);
         return ResponseEntity.ok(new CommonResponseDto(200, "네이버 로그인 성공", naverToken));
     }
@@ -139,6 +141,23 @@ public class UserController {
                                                          HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
         List<String> googleToken = googleService.googleLogin(code, response);
         return ResponseEntity.ok(new CommonResponseDto(200, "구글 로그인 성공", googleToken));
+    }
+
+    @PostMapping("/send-Email")
+    public ResponseEntity<CommonResponseDto> sendNumber(@Validated @RequestBody UserCertificateRequestDto dto) throws NoSuchAlgorithmException, MessageAggregationException, MessagingException {
+
+        emailService.sendNumber(dto.getEmail());
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "이메일 전송에 성공하였습니다. 🎉", null));
+
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<CommonResponseDto> verifyCertificationNumber(@RequestParam(name = "certificationNumber") String certificationNumber,
+                                                                       @RequestParam(name = "email") String email) {
+        emailService.verifyEmail(certificationNumber, email);
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "이메일 인증에 성공하였습니다. 🎉", null));
     }
 
 }
