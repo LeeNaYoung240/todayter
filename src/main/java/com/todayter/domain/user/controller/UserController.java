@@ -160,5 +160,4 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponseDto(200, "이메일 인증에 성공하였습니다. 🎉", null));
     }
 
-
 }
