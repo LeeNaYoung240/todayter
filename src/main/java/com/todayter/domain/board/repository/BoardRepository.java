@@ -4,7 +4,6 @@ import com.todayter.domain.board.entity.Board;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,9 +16,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByTypeAndCategory(Board.BoardType type, String category, Pageable pageable);
 
     Page<Board> findAllByPickTrue(Pageable pageable);
-
-    @Query("SELECT b.title FROM Board b")
-    Page<String> findTitlesOnly(Pageable pageable);
 
     Page<Board> findAll(Pageable pageable);
 

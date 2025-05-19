@@ -3,6 +3,7 @@ package com.todayter.domain.board.service;
 import com.todayter.domain.board.dto.BoardRequestDto;
 import com.todayter.domain.board.dto.BoardResponseDto;
 import com.todayter.domain.board.dto.BoardSummaryDto;
+import com.todayter.domain.board.dto.BoardTitleDto;
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
 import com.todayter.domain.user.entity.UserEntity;
@@ -117,10 +118,10 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Page<String> getBoardTitles(int page, int size) {
+    public Page<BoardTitleDto> getBoardTitles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
 
-        return boardRepository.findTitlesOnly(pageable);
+        return boardRepository.findAll(pageable).map(board -> new BoardTitleDto(board.getTitle()));
     }
 
     public Page<BoardSummaryDto> getBoardSummaries(int page, int size) {

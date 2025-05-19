@@ -3,6 +3,7 @@ package com.todayter.domain.board.controller;
 import com.todayter.domain.board.dto.BoardRequestDto;
 import com.todayter.domain.board.dto.BoardResponseDto;
 import com.todayter.domain.board.dto.BoardSummaryDto;
+import com.todayter.domain.board.dto.BoardTitleDto;
 import com.todayter.domain.board.service.BoardService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
@@ -69,10 +70,10 @@ public class BoardController {
     }
 
     @GetMapping("/titles")
-    public ResponseEntity<CommonResponseDto<Page<String>>> getBoardTitles(@RequestParam(value = "page") int page,
-                                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<Page<BoardTitleDto>>> getBoardTitles(@RequestParam(value = "page") int page,
+                                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<String> titles = boardService.getBoardTitles(page - 1, size);
+        Page<BoardTitleDto> titles = boardService.getBoardTitles(page - 1, size);
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 제목 목록 조회에 성공하였습니다. 🎉", titles));
     }
