@@ -38,7 +38,8 @@ public class BoardController {
     }
 
     @GetMapping("/pick")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page") int page, @RequestParam(value = "sortBy") String sortBy) {
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page") int page,
+                                                                                  @RequestParam(value = "sortBy") String sortBy) {
 
         Page<BoardResponseDto> boards = boardService.getPickedBoards(sortBy, page - 1, 5);
 
