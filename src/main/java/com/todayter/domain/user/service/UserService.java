@@ -3,6 +3,7 @@ package com.todayter.domain.user.service;
 import com.todayter.domain.user.dto.EditPasswordRequestDto;
 import com.todayter.domain.user.dto.ProfileResponseDto;
 import com.todayter.domain.user.dto.SignupRequestDto;
+import com.todayter.domain.user.dto.UserResponseDto;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.domain.user.entity.UserStatusEnum;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -123,6 +126,26 @@ public class UserService {
     }
 
     @Transactional
+    public void promoteToAdmin(Long targetUserId, UserEntity currentUser) {
+
+        if (!currentUser.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new CustomException(ErrorCode.NOT_ACCESS);
+        }
+
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (targetUser.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new CustomException(ErrorCode.ALREADY_ADMIN);
+        }
+
+        targetUser.setRole(UserRoleEnum.ADMIN);
+
+        userRepository.save(targetUser);
+
+    }
+
+    @Transactional
     public void withdrawUser(UserEntity user, String password) {
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
@@ -131,6 +154,35 @@ public class UserService {
 
         user.updateStatus(UserStatusEnum.WITHDRAW);
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAllUsers(UserEntity currentUser) {
+
+        if (!currentUser.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new CustomException(ErrorCode.NOT_ACCESS);
+        }
+
+        List<UserEntity> users = userRepository.findAll();
+
+        return users.stream()
+                .map(UserResponseDto::new)
+                .toList();
+    }
+
+    @Transactional
+    public void blockUser(Long userId, UserEntity userDetails) {
+        UserEntity userToBlock = getUserById(userId);
+
+        if (!userDetails.getRole().equals(UserRoleEnum.ADMIN)) {
+            throw new CustomException(ErrorCode.NOT_BLOCK);
+        }
+
+        if (userToBlock.isBlock()) {
+            throw new CustomException(ErrorCode.ALREADY_BLOCK);
+        }
+
+        userToBlock.updateStatus(UserStatusEnum.BLOCK);
     }
 
     @Transactional
@@ -157,25 +209,11 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    @Transactional
-    public void blockUser(Long userId, UserEntity userDetails) {
-        UserEntity userToBlock = getUserById(userId);
-
-        if (!userDetails.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new CustomException(ErrorCode.NOT_BLOCK);
-        }
-
-        if (userToBlock.isBlock()) {
-            throw new CustomException(ErrorCode.ALREADY_BLOCK);
-        }
-
-        userToBlock.updateStatus(UserStatusEnum.BLOCK);
-    }
-
     private UserEntity getUserById(Long userId) {
 
         return userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
+
 }

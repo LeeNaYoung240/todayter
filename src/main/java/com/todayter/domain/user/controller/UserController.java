@@ -160,4 +160,21 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponseDto(200, "이메일 인증에 성공하였습니다. 🎉", null));
     }
 
+    @GetMapping
+    public ResponseEntity<CommonResponseDto> getUsers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        List<UserResponseDto> users = userService.getAllUsers(userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "회원 목록 조회에 성공하였습니다. 🎉", users));
+    }
+
+    @PatchMapping("/{userId}/promote")
+    public ResponseEntity<CommonResponseDto> promoteToAdmin(@PathVariable Long userId,
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        userService.promoteToAdmin(userId, userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "회원 권한을 ADMIN으로 승격하였습니다. 🎉", null));
+    }
+
 }

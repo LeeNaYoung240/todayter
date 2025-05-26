@@ -88,4 +88,8 @@ public class UserEntity extends TimeStamped {
         this.username = username;
     }
 
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
 }

@@ -26,9 +26,9 @@ POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
-  "username" : "admin3",
-  "password" : "Admin2@",
-  "nickname" : "관리자3",
+  "username" : "admin1",
+  "password" : "Admin1@",
+  "nickname" : "관리자1",
   "email" : "abcd@naver.com",
   "isAdmin" : true,
   "adminToken" : "{{ADMIN_TOKEN}}"
