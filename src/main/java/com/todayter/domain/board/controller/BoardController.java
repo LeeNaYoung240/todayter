@@ -1,12 +1,10 @@
 package com.todayter.domain.board.controller;
 
-import com.todayter.domain.board.dto.BoardRequestDto;
-import com.todayter.domain.board.dto.BoardResponseDto;
-import com.todayter.domain.board.dto.BoardSummaryDto;
-import com.todayter.domain.board.dto.BoardTitleDto;
+import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.service.BoardService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -31,10 +29,27 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<CommonResponseDto<BoardResponseDto>> getBoard(@PathVariable("boardId") Long boardId) {
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> getBoard(@PathVariable Long boardId) {
         BoardResponseDto responseDto = boardService.getBoard(boardId);
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "일정 단건 조회에 성공하였습니다. 🎉", responseDto));
+    }
+
+    @PatchMapping("/{boardId}")
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> updateBoard(@PathVariable Long boardId,
+                                                                           @Valid @RequestBody BoardUpdateRequestDto boardUpdateRequestDto,
+                                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        BoardResponseDto responseDto = boardService.updateBoard(boardId, boardUpdateRequestDto, userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 수정에 성공하였습니다. 🎉", responseDto));
+    }
+
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> deleteBoard(@PathVariable Long boardId,
+                                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boardService.deleteBoard(boardId, userDetails.getUser());
+
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 삭제에 성공하였습니다. 🎉", null), HttpStatus.OK);
     }
 
     @GetMapping("/pick")
@@ -86,6 +101,15 @@ public class BoardController {
         Page<BoardSummaryDto> summaries = boardService.getBoardSummaries(page - 1, size);
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "요약형 게시글 목록 조회에 성공하였습니다. 🎉", summaries));
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getMyBoards(@RequestParam(value = "page") int page,
+                                                                                 @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Page<BoardResponseDto> boards = boardService.getBoardsByAdmin(userDetails.getUser(), page - 1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "관리자 본인 작성 게시글 조회에 성공하였습니다. 🎉", boards));
     }
 
 }

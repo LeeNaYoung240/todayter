@@ -1,10 +1,10 @@
 package com.todayter.domain.board.entity;
 
 import com.todayter.domain.board.dto.BoardRequestDto;
+import com.todayter.domain.board.dto.BoardUpdateRequestDto;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.global.entity.TimeStamped;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,13 +48,6 @@ public class Board extends TimeStamped {
         this.category = category;
     }
 
-    @Builder
-    public Board(String title, String contents, BoardType type) {
-        this.title = title;
-        this.contents = contents;
-        this.type = type;
-    }
-
     public Board(UserEntity user, BoardRequestDto requestDto, BoardType type) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContent();
@@ -71,18 +64,6 @@ public class Board extends TimeStamped {
         }
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
-    }
-
-    public void updateContents(String contents) {
-        this.contents = contents;
-    }
-
-    public void updateType(BoardType type) {
-        this.type = type;
-    }
-
     public enum BoardType {
         NORMAL, // 일반
         LOCAL, // 지역별
@@ -96,8 +77,9 @@ public class Board extends TimeStamped {
         this.pick = pick;
     }
 
-    public boolean isPick() {
-        return pick;
+    public void update(BoardUpdateRequestDto dto) {
+        this.title = dto.getTitle();
+        this.contents = dto.getContent();
     }
 
 }

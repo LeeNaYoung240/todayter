@@ -1,9 +1,6 @@
 package com.todayter.domain.board.service;
 
-import com.todayter.domain.board.dto.BoardRequestDto;
-import com.todayter.domain.board.dto.BoardResponseDto;
-import com.todayter.domain.board.dto.BoardSummaryDto;
-import com.todayter.domain.board.dto.BoardTitleDto;
+import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
 import com.todayter.domain.user.entity.UserEntity;
@@ -117,6 +114,22 @@ public class BoardService {
         return boards.map(BoardResponseDto::new);
     }
 
+    @Transactional
+    public BoardResponseDto updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto, UserEntity user) {
+        Board board = findById(boardId);
+        validateUserMatch(board, user);
+        board.update(boardUpdateRequestDto);
+
+        return new BoardResponseDto(board);
+    }
+
+    @Transactional
+    public void deleteBoard(Long boardId, UserEntity user) {
+        Board board = findById(boardId);
+        validateUserMatch(board, user);
+        boardRepository.delete(board);
+    }
+
     @Transactional(readOnly = true)
     public Page<BoardTitleDto> getBoardTitles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
@@ -138,11 +151,30 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getBoardsByAdmin(UserEntity user, int page, int size) {
+        if (!user.hasRole(UserRoleEnum.Authority.ADMIN)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        Page<Board> boards = boardRepository.findAllByUser(user, pageable);
+
+        return boards.map(BoardResponseDto::new);
+    }
+
+    @Transactional(readOnly = true)
     public Board findById(Long boardId) {
 
         return boardRepository.findById(boardId).orElseThrow(
                 () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
         );
     }
+
+    private void validateUserMatch(Board board, UserEntity user) {
+        if (!board.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorCode.USER_NOT_MATCH_WITH_BOARD);
+        }
+    }
+
 
 }
