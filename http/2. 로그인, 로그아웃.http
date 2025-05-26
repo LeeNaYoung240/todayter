@@ -3,8 +3,8 @@ POST http://localhost:8081/api/users/login
 Content-Type: application/json
 
 {
-  "username": "username5",
-  "password": "Password5!"
+  "username": "username6",
+  "password": "Password6!"
 }
 
 > {%
@@ -43,7 +43,7 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "nickname" : "두땡"
+  "nickname": "두땡"
 }
 
 ### 2-3. 로그아웃

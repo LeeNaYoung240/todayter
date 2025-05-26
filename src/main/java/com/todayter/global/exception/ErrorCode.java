@@ -41,6 +41,12 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(404, "존재하지 않는 오류입니다."),
     USER_NOT_MATCH_WITH_COMMENT(404, "해당 댓글의 작성자가 아니면 수정할 수 없습니다."),
     BAD_WORD_DETECTED(403, "욕설/비방 단어가 포함되어 있습니다."),
+
+    // Like 관련 오류 처리
+    ALREADY_LIKED(409, "이미 좋아요를 누른 게시글입니다."),
+    LIKE_NOT_EXIST(404, "좋아요가 존재하지 않습니다."),
+    CANNOT_CANCEL_OTHERS_LIKE(403, "다른 사람의 좋아요는 취소할 수 없습니다."),
+    LIKE_NOT_FOUND(404, "해당 게시글에 좋아요를 누른 기록이 없습니다.")
     ;
 
     private int status;

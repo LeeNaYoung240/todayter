@@ -44,6 +44,9 @@ public class Board extends TimeStamped {
     @Column(nullable = true)
     private Boolean pick;
 
+    @Column(nullable = false)
+    private Long likeCnt = 0L;
+
     public void setCategory(String category) {
         this.category = category;
     }
@@ -62,6 +65,15 @@ public class Board extends TimeStamped {
         } else if (type == BoardType.SECTION) {
             this.section = requestDto.getSection();
         }
+    }
+
+    public void addLikeCnt() {
+        this.likeCnt++;
+    }
+
+    public void minusLikeCount() {
+
+        this.likeCnt--;
     }
 
     public enum BoardType {

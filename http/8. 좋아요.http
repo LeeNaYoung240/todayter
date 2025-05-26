@@ -1,0 +1,14 @@
+#### 8-1. 게시글 좋아요 등록
+POST http://localhost:8081/api/boards/1/likes
+Content-Type: application/json
+Authorization: {{access_token}}
+
+#### 8-2. 게시글 좋아요 취소
+DELETE http://localhost:8081/api/boards/likes/1
+Content-Type: application/json
+Authorization: {{access_token}}
+
+#### 8-3. 게시글 좋아요 조회
+GET http://localhost:8081/api/boards/1/likes
+Content-Type: application/json
+Authorization: {{access_token}}
