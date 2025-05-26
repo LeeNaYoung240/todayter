@@ -47,6 +47,9 @@ public class Board extends TimeStamped {
     @Column(nullable = false)
     private Long likeCnt = 0L;
 
+    @Column(columnDefinition = "bigint default 0", nullable = false)
+    private Long hits = 0L;
+
     public void setCategory(String category) {
         this.category = category;
     }
@@ -92,6 +95,11 @@ public class Board extends TimeStamped {
     public void update(BoardUpdateRequestDto dto) {
         this.title = dto.getTitle();
         this.contents = dto.getContent();
+    }
+
+    public Long getHits() {
+
+        return hits;
     }
 
 }

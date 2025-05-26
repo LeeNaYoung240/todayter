@@ -40,10 +40,11 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public BoardResponseDto getBoard(Long boardId) {
         Board board = findById(boardId);
 
+        boardRepository.updateHits(boardId);
         return new BoardResponseDto(board);
     }
 
