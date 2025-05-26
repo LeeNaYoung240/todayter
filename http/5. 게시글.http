@@ -23,7 +23,7 @@ Authorization: {{access_token}}
 }
 
 #### 5-2. 게시글 조회
-GET http://localhost:8081/api/boards/3
+GET http://localhost:8081/api/boards/1
 
 #### 5-3-1. 게시글 섹션별 조회 (지역별)
 GET http://localhost:8081/api/boards/section?page=1&sortBy=createdAt&sectionType=지역별&sectionName=익산
@@ -67,3 +67,4 @@ Authorization: {{access_token}}
 GET http://localhost:8081/api/boards/admin?page=1&size=10
 Content-Type: application/json
 Authorization: {{access_token}}
+
