@@ -51,8 +51,8 @@ public class KakaoService {
         UserEntity kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);  // 회원가입 또는 로그인
 
         // JWT 토큰 생성
-        String jwtAccessToken = jwtProvider.createAccessToken(kakaoUser.getLoginId(), kakaoUser.getRole());
-        String jwtRefreshToken = jwtProvider.createRefreshToken(kakaoUser.getLoginId());
+        String jwtAccessToken = jwtProvider.createAccessToken(kakaoUser.getUsername(), kakaoUser.getRole());
+        String jwtRefreshToken = jwtProvider.createRefreshToken(kakaoUser.getUsername());
 
         kakaoUser.updateRefresh(jwtRefreshToken);
         userRepository.save(kakaoUser);  // DB에 저장
@@ -158,29 +158,33 @@ public class KakaoService {
 
     // 카카오 사용자 등록 또는 로그인
     private UserEntity registerKakaoUserIfNeeded(KaKaoUserInfoDto kakaoUserInfo) {
-        String socialId = kakaoUserInfo.getId();
-        // 기존 유저인지 확인
-        UserEntity kakaoUser = userRepository.findBySocialId(socialId).orElse(null);
+        String kakaoIdAsUsername = kakaoUserInfo.getId();
+
+        UserEntity kakaoUser = userRepository.findByUsername(kakaoIdAsUsername).orElse(null);
 
         if (kakaoUser == null) {
-            // 같은 이메일을 가진 유저가 있을 경우 기존 유저로 등록
             String kakaoEmail = kakaoUserInfo.getEmail();
             UserEntity sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
-            if (sameEmailUser != null) {
-                kakaoUser = sameEmailUser;
-                kakaoUser = kakaoUser.socialIdUpdate(socialId);  // socialId 업데이트
-            } else {
-                // 새로운 사용자라면 회원가입
-                String nickname = kakaoUserInfo.getNickname();
-                String password = UUID.randomUUID().toString();  // 임시 비밀번호
-                String encodedPassword = passwordEncoder.encode(password);
-                String loginId = UUID.randomUUID().toString();  // 임시 로그인 ID
-                String email = kakaoUserInfo.getEmail();
 
-                kakaoUser = new UserEntity(nickname, email, encodedPassword, kakaoUserInfo.getNickname(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
+            if (sameEmailUser != null) {
+                sameEmailUser.setUsername(kakaoIdAsUsername);
+                kakaoUser = sameEmailUser;
+            } else {
+                String tempPassword = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(tempPassword);
+
+                kakaoUser = new UserEntity(
+                        kakaoIdAsUsername,
+                        kakaoUserInfo.getEmail(),
+                        encodedPassword,
+                        kakaoUserInfo.getNickname(),
+                        UserStatusEnum.ACTIVE,
+                        UserRoleEnum.USER
+                );
             }
         }
 
         return kakaoUser;
     }
+
 }

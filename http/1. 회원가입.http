@@ -3,8 +3,8 @@ POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
-  "username" : "username4",
-  "password" : "Password4!",
+  "username" : "username5",
+  "password" : "Password5!",
   "nickname" : "영나이",
   "email" : "dlskdud12@naver.com",
   "isAdmin" : false
@@ -26,9 +26,9 @@ POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
-  "username" : "admin2",
+  "username" : "admin3",
   "password" : "Admin2@",
-  "nickname" : "관리자2",
+  "nickname" : "관리자3",
   "email" : "abcd@naver.com",
   "isAdmin" : true,
   "adminToken" : "{{ADMIN_TOKEN}}"

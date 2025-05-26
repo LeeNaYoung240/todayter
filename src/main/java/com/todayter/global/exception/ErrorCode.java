@@ -30,10 +30,16 @@ public enum ErrorCode {
     SORT_NOT_FOUND(404, "찾을 수 없는 정렬입니다."),
     SECTION_TYPE_NOT_FOUND(404, "섹션 타입을 찾을 수 없습니다."),
     UNAUTHORIZED(404, "권환이 없습니다."),
+    USER_NOT_MATCH_WITH_BOARD(404,"해당 게시글의 작성자가 아니면 수정할 수 없습니다."),
 
     // Redis 관련 오류 처리
     REDIS_NOT_CONNECT(500, "레디스 서버에 연결할 수 없습니다."),
     VERIFY_NOT_ALLOWED(400, "인증 요청이 잘못 되었습니다."),
+
+    // Comment 관련 오류 처리
+    COMMENT_NOT_FOUND(404, "존재하지 않는 오류입니다."),
+    USER_NOT_MATCH_WITH_COMMENT(404, "해당 댓글의 작성자가 아니면 수정할 수 없습니다."),
+    BAD_WORD_DETECTED(403, "욕설/비방 단어가 포함되어 있습니다."),
     ;
 
     private int status;

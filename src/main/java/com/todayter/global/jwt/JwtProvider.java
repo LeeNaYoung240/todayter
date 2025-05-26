@@ -44,26 +44,26 @@ public class JwtProvider {
     }
 
     // 액세스 토큰 생성
-    public String createAccessToken(String loginId, UserRoleEnum role) {
+    public String createAccessToken(String username, UserRoleEnum role) {
 
-        return generateToken(loginId, role, tokenExpiration);
+        return generateToken(username, role, tokenExpiration);
     }
 
     // 리프레시 토큰 생성
-    public String createRefreshToken(String loginId) {
+    public String createRefreshToken(String username) {
 
-        return generateRefreshToken(loginId, refreshTokenExpiration);
+        return generateRefreshToken(username, refreshTokenExpiration);
     }
 
     // JWT 토큰 생성 (액세스 토큰)
-    private String generateToken(String loginId, UserRoleEnum role, long expiration) {
+    private String generateToken(String username, UserRoleEnum role, long expiration) {
 
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime expirationTime = now.plusSeconds(expiration / 1000);
         System.out.println("UTC Time: " + now);
 
         return Jwts.builder()
-                .setSubject(loginId)
+                .setSubject(username)
                 .claim("role", role.getAuthority())
                 .setIssuedAt(Date.from(now.toInstant()))
                 .setExpiration(Date.from(expirationTime.toInstant()))
@@ -73,13 +73,13 @@ public class JwtProvider {
     }
 
     // JWT 토큰 생성 (리프레시 토큰)
-    private String generateRefreshToken(String loginId, long expiration) {
+    private String generateRefreshToken(String username, long expiration) {
 
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ZonedDateTime expirationTime = now.plusSeconds(expiration / 1000);
 
         return Jwts.builder()
-                .setSubject(loginId)
+                .setSubject(username)
                 .claim("type", "refresh")
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(Date.from(now.toInstant()))

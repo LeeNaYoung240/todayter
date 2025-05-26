@@ -48,8 +48,8 @@ public class NaverService {
         NaverUserInfoDto userInfo = getUserInfo(accessToken);
 
         UserEntity user = registerIfNeeded(userInfo);
-        String jwtAccessToken = jwtProvider.createAccessToken(user.getLoginId(), user.getRole());
-        String jwtRefreshToken = jwtProvider.createRefreshToken(user.getLoginId());
+        String jwtAccessToken = jwtProvider.createAccessToken(user.getUsername(), user.getRole());
+        String jwtRefreshToken = jwtProvider.createRefreshToken(user.getUsername());
         user.updateRefresh(jwtRefreshToken);
         userRepository.save(user);
 
@@ -66,6 +66,7 @@ public class NaverService {
                 .queryParam("client_secret", clientSecret)
                 .queryParam("code", code)
                 .queryParam("state", state)
+                .queryParam("redirect_uri", redirectUri)
                 .build()
                 .toUri();
 
@@ -97,30 +98,28 @@ public class NaverService {
     }
 
     private UserEntity registerIfNeeded(NaverUserInfoDto userInfo) {
-        String naverId = userInfo.getId();  // 네이버 ID를 가져옴
-        UserEntity user = userRepository.findBySocialId(naverId).orElse(null);  // socialId로 사용자 찾기
+        String naverId = userInfo.getId();
+
+        UserEntity user = userRepository.findByUsername(naverId).orElse(null);
+
         if (user == null) {
             String email = userInfo.getEmail();
             UserEntity sameEmailUser = userRepository.findByEmail(email).orElse(null);
 
             if (sameEmailUser != null) {
-                user = sameEmailUser.socialIdUpdate(naverId);  // 기존 사용자에게 socialId (네이버 ID)를 업데이트
+                sameEmailUser.setUsername(naverId);
+                user = sameEmailUser;
             } else {
-                String randomPwd = UUID.randomUUID().toString();
-                String encodedPwd = passwordEncoder.encode(randomPwd);
-                String loginId = UUID.randomUUID().toString();
-                String nickname = userInfo.getNickname();
-
+                String tempPassword = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(tempPassword);
 
                 user = new UserEntity(
-                        nickname,
-                        email,
-                        encodedPwd,
+                        naverId,
+                        userInfo.getEmail(),
+                        encodedPassword,
                         userInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
-                        UserRoleEnum.USER,
-                        naverId,  // socialId에 네이버 ID 저장
-                        loginId
+                        UserRoleEnum.USER
                 );
             }
         }

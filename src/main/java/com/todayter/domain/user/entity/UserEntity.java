@@ -25,14 +25,8 @@ public class UserEntity extends TimeStamped {
     @Column
     private String nickname;
 
-    @Column
-    private String loginId;
-
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String refreshToken;
-
-    @Column
-    private String socialId;
 
     @Column(nullable = false)
     private String email;
@@ -53,15 +47,13 @@ public class UserEntity extends TimeStamped {
         this.role = role;
     }
 
-    public UserEntity(String username, String email, String encodedPassword, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum, String socialId, String loginId) {
+    public UserEntity(String username, String email, String encodedPassword, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum) {
         this.username = username;
         this.password = encodedPassword;
         this.nickname = nickname;
         this.email = email;
         this.status = userStatusEnum;
         this.role = userRoleEnum;
-        this.socialId = socialId;
-        this.loginId = loginId;
     }
 
     public void encryptionPassword(String password) {
@@ -84,21 +76,16 @@ public class UserEntity extends TimeStamped {
         this.status = status;
     }
 
-    public UserEntity socialIdUpdate(String socialId) {
-        this.socialId = socialId;
-        return this;
-    }
-
-    public String getLoginId() {
-        return loginId;
-    }
-
     public boolean isBlock() {
         return this.status == UserStatusEnum.BLOCK;
     }
 
     public boolean hasRole(String role) {
         return this.role != null && this.role.getAuthority().equals(role);
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
 }

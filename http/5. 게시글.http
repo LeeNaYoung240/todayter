@@ -5,7 +5,7 @@ Authorization: {{access_token}}
 
 {
   "title" : "금세 바보 테스트1",
-  "content" : "🍖",
+  "content" : "안녕",
   "category": "지역별",
   "region": "익산"
 }
@@ -17,7 +17,7 @@ Authorization: {{access_token}}
 
 {
   "title" : "금세 바보 테스트2",
-  "content" : "🍖",
+  "content" : "테스트2",
   "category": "분야별",
   "section": "정치"
 }
@@ -48,4 +48,22 @@ PATCH http://localhost:8081/api/boards/14/pick?pick=true
 Content-Type: application/json
 Authorization: {{access_token}}
 
+#### 5-6. 게시글 수정
+PATCH http://localhost:8081/api/boards/16
+Content-Type: application/json
+Authorization: {{access_token}}
 
+{
+  "title" : "수정테스트",
+  "content" : "수정합니다."
+}
+
+#### 5-7. 게시글 삭제
+DELETE http://localhost:8081/api/boards/16
+Content-Type: application/json
+Authorization: {{access_token}}
+
+#### 5-8. 관리자 본인 작성 게시글 조회
+GET http://localhost:8081/api/boards/admin?page=1&size=10
+Content-Type: application/json
+Authorization: {{access_token}}

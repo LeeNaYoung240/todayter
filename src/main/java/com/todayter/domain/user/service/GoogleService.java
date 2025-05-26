@@ -55,8 +55,8 @@ public class GoogleService {
         UserEntity googleUser = registerGoogleUserIfNeeded(googleUserInfo);  // 회원가입 또는 로그인
 
         // JWT 토큰 생성
-        String jwtAccessToken = jwtProvider.createAccessToken(googleUser.getLoginId(), googleUser.getRole());
-        String jwtRefreshToken = jwtProvider.createRefreshToken(googleUser.getLoginId());
+        String jwtAccessToken = jwtProvider.createAccessToken(googleUser.getUsername(), googleUser.getRole());
+        String jwtRefreshToken = jwtProvider.createRefreshToken(googleUser.getUsername());
 
         googleUser.updateRefresh(jwtRefreshToken);
         userRepository.save(googleUser);  // DB에 저장
@@ -127,24 +127,27 @@ public class GoogleService {
 
     // 구글 사용자 등록 또는 로그인
     private UserEntity registerGoogleUserIfNeeded(GoogleUserInfoDto googleUserInfo) {
-        String socialId = googleUserInfo.getId();
-        UserEntity googleUser = userRepository.findBySocialId(socialId).orElse(null);  // socialId로 검색
+        String socialIdAsUsername  = googleUserInfo.getId();
+        UserEntity googleUser = userRepository.findByUsername(socialIdAsUsername ).orElse(null);
 
         if (googleUser == null) {
             String googleEmail = googleUserInfo.getEmail();
             UserEntity sameEmailUser = userRepository.findByEmail(googleEmail).orElse(null);
             if (sameEmailUser != null) {
+                sameEmailUser.setUsername(socialIdAsUsername);
                 googleUser = sameEmailUser;
-                googleUser = googleUser.socialIdUpdate(socialId);
             } else {
-                String password = UUID.randomUUID().toString();  // 임시 비밀번호
-                String encodedPassword = passwordEncoder.encode(password);
-                String loginId = UUID.randomUUID().toString();  // 임시 로그인 ID
-                String email = googleUserInfo.getEmail();
-                String nickname = googleUserInfo.getNickname();
+                String tempPassword = UUID.randomUUID().toString();
+                String encodedPassword = passwordEncoder.encode(tempPassword);
 
-
-                googleUser = new UserEntity(nickname ,email, encodedPassword, googleUserInfo.getNickname(), UserStatusEnum.ACTIVE, UserRoleEnum.USER, socialId, loginId);
+                googleUser = new UserEntity(
+                        socialIdAsUsername,
+                        googleUserInfo.getEmail(),
+                        encodedPassword,
+                        googleUserInfo.getNickname(),
+                        UserStatusEnum.ACTIVE,
+                        UserRoleEnum.USER
+                );
             }
         }
 
