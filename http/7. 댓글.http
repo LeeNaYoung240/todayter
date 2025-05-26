@@ -1,0 +1,27 @@
+#### 7-1. 댓글 등록
+POST http://localhost:8081/api/boards/21/comments
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "content": "ㅎㅇ"
+}
+
+#### 7-2. 댓글 조회
+GET http://localhost:8081/api/boards/20/comments
+Content-Type: application/json
+Authorization: {{access_token}}
+
+#### 7-3. 댓글 수정
+PATCH http://localhost:8081/api/boards/comments/1
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "content": "댓글 수정 테스트"
+}
+
+#### 7-4. 댓글 삭제
+DELETE http://localhost:8081/api/boards/comments/4
+Content-Type: application/json
+Authorization: {{access_token}}
