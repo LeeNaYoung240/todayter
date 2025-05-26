@@ -37,6 +37,14 @@ public class UserService {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }
 
+        if (isEmailExist(signupDto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
+        if (isNicknameExist(signupDto.getNickname())) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+
         UserRoleEnum userRole = UserRoleEnum.USER;
         if (!signupDto.getAdminToken().isEmpty()) {
             if (!ADMIN_TOKEN.equals(signupDto.getAdminToken())) {
@@ -141,6 +149,12 @@ public class UserService {
     public boolean isNicknameExist(String nickname) {
 
         return userRepository.existsByNickname(nickname);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isEmailExist(String email) {
+
+        return userRepository.existsByEmail(email);
     }
 
     @Transactional

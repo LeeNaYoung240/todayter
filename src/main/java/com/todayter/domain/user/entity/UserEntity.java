@@ -16,19 +16,19 @@ public class UserEntity extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column
     private String password;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(columnDefinition = "TEXT")
     private String refreshToken;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)

@@ -24,6 +24,7 @@ public enum ErrorCode {
     INCORRECT_PASSWORD(500, "현재 비밀번호가 일치하지 않습니다."),
     CONFIRM_NEW_PASSWORD_NOT_MATCH(500, "새로운 비밀번호가 서로 일치하지 않습니다."),
     NEW_PASSWORD_CANNOT_BE_SAME_AS_OLD(500, "새 비밀번호는 현재 비밀번호와 같을 수 없습니다."),
+    DUPLICATE_EMAIL(404, "이미 존재하는 이메일입니다."),
 
     // board 관련 오류 처리
     BOARD_NOT_FOUND(404, "존재하지 않는 게시글입니다."),
