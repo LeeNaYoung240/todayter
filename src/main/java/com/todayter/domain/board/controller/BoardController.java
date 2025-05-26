@@ -112,4 +112,20 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "관리자 본인 작성 게시글 조회에 성공하였습니다. 🎉", boards));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> searchBoards(@RequestParam("keyword") String keyword,
+                                                                                  @RequestParam(value = "page") int page,
+                                                                                  @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<BoardResponseDto> results = boardService.searchBoards(keyword, page - 1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 검색에 성공하였습니다. 🎉", results));
+    }
+
+    @PatchMapping("/{boardId}/approve")
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> approveBoard(@PathVariable Long boardId,
+                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        BoardResponseDto responseDto = boardService.approveBoard(boardId, userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인이 완료되었습니다. ✅", responseDto));
+    }
 }

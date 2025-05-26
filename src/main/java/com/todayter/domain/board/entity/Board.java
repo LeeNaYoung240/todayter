@@ -44,11 +44,17 @@ public class Board extends TimeStamped {
     @Column(nullable = true)
     private Boolean pick;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean approved = false;
+
     @Column(nullable = false)
     private Long likeCnt = 0L;
 
     @Column(columnDefinition = "bigint default 0", nullable = false)
     private Long hits = 0L;
+
+    @Column(name = "hour_hits", nullable = false)
+    private Long hourHits = 0L;
 
     public void setCategory(String category) {
         this.category = category;
@@ -77,6 +83,10 @@ public class Board extends TimeStamped {
     public void minusLikeCount() {
 
         this.likeCnt--;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     public enum BoardType {

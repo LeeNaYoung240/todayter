@@ -84,6 +84,10 @@ public class UserEntity extends TimeStamped {
         return this.role != null && this.role.getAuthority().equals(role);
     }
 
+    public boolean isAdmin() {
+        return this.getRole() == UserRoleEnum.ADMIN;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }

@@ -34,6 +34,7 @@ public enum ErrorCode {
     SECTION_TYPE_NOT_FOUND(404, "섹션 타입을 찾을 수 없습니다."),
     UNAUTHORIZED(404, "권환이 없습니다."),
     USER_NOT_MATCH_WITH_BOARD(404,"해당 게시글의 작성자가 아니면 수정할 수 없습니다."),
+    ADMIN_ACCESS(404,"관리자만 승인할 수 있습니다."),
 
     // Redis 관련 오류 처리
     REDIS_NOT_CONNECT(500, "레디스 서버에 연결할 수 없습니다."),

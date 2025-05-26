@@ -163,6 +163,29 @@ public class BoardService {
         return boards.map(BoardResponseDto::new);
     }
 
+    @Transactional
+    public BoardResponseDto approveBoard(Long boardId, UserEntity adminUser) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!adminUser.isAdmin()) {
+            throw new CustomException(ErrorCode.ADMIN_ACCESS);
+        }
+
+        board.setApproved(true);
+        boardRepository.save(board);
+
+        return new BoardResponseDto(board);
+    }
+
+
+    public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return boardRepository.findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(keyword, keyword, pageRequest)
+                .map(BoardResponseDto::new);
+    }
+
     @Transactional(readOnly = true)
     public Board findById(Long boardId) {
 
