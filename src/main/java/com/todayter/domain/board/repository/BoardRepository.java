@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespositoryCustom {
 
     Page<Board> findAllByType(Board.BoardType type, Pageable pageable);
 
@@ -28,5 +28,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Modifying
     @Query("UPDATE Board s SET s.hits = s.hits + 1 WHERE s.id = :boardId")
     int updateHits(@Param("boardId") Long boardId);
+
+    @Modifying
+    @Query("UPDATE Board s SET s.hourHits = s.hourHits + 1 WHERE s.id = :boardId")
+    int updateHourHits(@Param("boardId") Long boardId);
+
+    Page<Board> findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(String title, String contents, Pageable pageable);
 
 }

@@ -3,10 +3,10 @@ POST http://localhost:8081/api/users/signup
 Content-Type: application/json
 
 {
-  "username": "username6",
-  "password": "Password6!",
-  "nickname": "영나이5",
-  "email": "dlskdud15@naver.com",
+  "username": "username7",
+  "password": "Password7!",
+  "nickname": "영나이7",
+  "email": "dlskdud17@naver.com",
   "isAdmin": false
 }
 

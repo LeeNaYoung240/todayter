@@ -15,6 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -45,6 +48,7 @@ public class BoardService {
         Board board = findById(boardId);
 
         boardRepository.updateHits(boardId);
+        boardRepository.updateHourHits(boardId);
         return new BoardResponseDto(board);
     }
 
@@ -200,5 +204,15 @@ public class BoardService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<Long> getRanking() {
+        System.out.println("BoardService.getRanking() 호출됨");
 
+        return boardRepository.getBoardIdRanking()
+                .orElse(Collections.emptyList());
+    }
+
+    public void deleteAllHourHits() {
+        boardRepository.deleteAllHourHits();
+    }
 }

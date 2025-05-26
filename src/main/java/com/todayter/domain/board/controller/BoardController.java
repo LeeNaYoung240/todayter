@@ -1,5 +1,6 @@
 package com.todayter.domain.board.controller;
 
+import com.todayter.domain.board.dao.BoardRankingDao;
 import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.service.BoardService;
 import com.todayter.global.dto.CommonResponseDto;
@@ -12,12 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/boards")
 public class BoardController {
 
     private final BoardService boardService;
+    private final BoardRankingDao boardRankingDao;
 
     @PostMapping()
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> addBoard(@RequestBody BoardRequestDto requestDto,
@@ -128,4 +132,13 @@ public class BoardController {
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인이 완료되었습니다. ✅", responseDto));
     }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<CommonResponseDto<List<Long>>> getTopSchedules() {
+        List<Long> ranking = boardRankingDao.getRanking();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "상위 5개의 인기 일정 ID를 성공적으로 조회했습니다.", ranking));
+    }
+
+
 }

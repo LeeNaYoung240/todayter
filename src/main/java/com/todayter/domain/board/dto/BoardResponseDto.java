@@ -17,6 +17,7 @@ public class BoardResponseDto {
     private String section;
     private Long likeCnt;
     private Long hits;
+    private Long hourHits;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -29,6 +30,7 @@ public class BoardResponseDto {
         this.section = board.getSection();
         this.type = board.getType().name();
         this.likeCnt = board.getLikeCnt();
+        this.hourHits = board.getHourHits();
         this.hits = board.getHits();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
