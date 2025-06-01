@@ -3,6 +3,7 @@ package com.todayter.domain.board.controller;
 import com.todayter.domain.board.dao.BoardRankingDao;
 import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.service.BoardService;
+import com.todayter.domain.board.service.SearchKeywordService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -22,6 +23,7 @@ public class BoardController {
 
     private final BoardService boardService;
     private final BoardRankingDao boardRankingDao;
+    private final SearchKeywordService searchKeywordService;
 
     @PostMapping()
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> addBoard(@RequestBody BoardRequestDto requestDto,
@@ -120,6 +122,9 @@ public class BoardController {
     public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> searchBoards(@RequestParam("keyword") String keyword,
                                                                                   @RequestParam(value = "page") int page,
                                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        searchKeywordService.recordSearchKeyword(keyword);
+
         Page<BoardResponseDto> results = boardService.searchBoards(keyword, page - 1, size);
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 검색에 성공하였습니다. 🎉", results));
@@ -144,21 +149,28 @@ public class BoardController {
     public ResponseEntity<CommonResponseDto<Long>> getBoardCnt() {
         long totalBoards = boardService.getTotalBoardCnt();
 
-        return ResponseEntity.ok(new CommonResponseDto<>(200, "전체 기사 수 조회에 성공하였습니다. 🎉", totalBoards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "전체 기사 수 조회에 성공하였습니다. 🎉", totalBoards));
     }
 
     @GetMapping("/approved-board-cnt")
     public ResponseEntity<CommonResponseDto<Long>> getApprovedBoardCnt() {
         long approvedBoards = boardService.getApprovedCnt();
 
-        return ResponseEntity.ok(new CommonResponseDto<>(200, "승인된 기사 수 조회에 성공하였습니다. 🎉", approvedBoards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "승인된 기사 수 조회에 성공하였습니다. 🎉", approvedBoards));
     }
 
     @GetMapping("/unapproved-board-cnt")
     public ResponseEntity<CommonResponseDto<Long>> getUnapprovedBoardCnt() {
         long unapprovedBoards = boardService.getUnapprovedCnt();
 
-        return ResponseEntity.ok(new CommonResponseDto<>(200, "미승인 기사 수 조회에 성공하였습니다. 🎉", unapprovedBoards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "미승인 기사 수 조회에 성공하였습니다. 🎉", unapprovedBoards));
+    }
+
+    @GetMapping("/popular-keywords")
+    public ResponseEntity<CommonResponseDto<List<String>>> getPopularKeywords() {
+        List<String> popular = searchKeywordService.getTopKeywords(10);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "인기 검색어 10개 조회에 성공하였습니다. 🎉", popular));
     }
 
 }

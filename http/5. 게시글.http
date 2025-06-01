@@ -80,3 +80,6 @@ Authorization: {{access_token}}
 
 #### 5-11. 5개 인기 랭킹 조회
 GET http://localhost:8081/api/boards/ranking
+
+#### 5-12. 10개 인기 검색어
+GET http://localhost:8081/api/boards/popular-keywords
