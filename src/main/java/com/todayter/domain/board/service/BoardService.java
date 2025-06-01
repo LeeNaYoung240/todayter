@@ -182,12 +182,23 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
-
     public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         return boardRepository.findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(keyword, keyword, pageRequest)
                 .map(BoardResponseDto::new);
+    }
+
+    public long getTotalBoardCnt() {
+        return boardRepository.count();
+    }
+
+    public long getApprovedCnt() {
+        return boardRepository.countByApprovedTrue();
+    }
+
+    public long getUnapprovedCnt() {
+        return boardRepository.countByApprovedFalse();
     }
 
     @Transactional(readOnly = true)
@@ -206,7 +217,6 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<Long> getRanking() {
-        System.out.println("BoardService.getRanking() 호출됨");
 
         return boardRepository.getBoardIdRanking()
                 .orElse(Collections.emptyList());

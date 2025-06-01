@@ -140,5 +140,25 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "상위 5개의 인기 일정 ID를 성공적으로 조회했습니다.", ranking));
     }
 
+    @GetMapping("/board-cnt")
+    public ResponseEntity<CommonResponseDto<Long>> getBoardCnt() {
+        long totalBoards = boardService.getTotalBoardCnt();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "전체 기사 수 조회에 성공하였습니다. 🎉", totalBoards));
+    }
+
+    @GetMapping("/approved-board-cnt")
+    public ResponseEntity<CommonResponseDto<Long>> getApprovedBoardCnt() {
+        long approvedBoards = boardService.getApprovedCnt();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "승인된 기사 수 조회에 성공하였습니다. 🎉", approvedBoards));
+    }
+
+    @GetMapping("/unapproved-board-cnt")
+    public ResponseEntity<CommonResponseDto<Long>> getUnapprovedBoardCnt() {
+        long unapprovedBoards = boardService.getUnapprovedCnt();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "미승인 기사 수 조회에 성공하였습니다. 🎉", unapprovedBoards));
+    }
 
 }

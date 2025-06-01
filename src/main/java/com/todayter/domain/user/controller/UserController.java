@@ -177,4 +177,11 @@ public class UserController {
         return ResponseEntity.ok(new CommonResponseDto(200, "회원 권한을 ADMIN으로 승격하였습니다. 🎉", null));
     }
 
+    @GetMapping("/user-cnt")
+    public ResponseEntity<CommonResponseDto<Long>> getUserCnt() {
+        long totalUsers = userService.getTotalUserCnt();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "전체 회원 수 조회에 성공하였습니다. 🎉", totalUsers));
+    }
+
 }

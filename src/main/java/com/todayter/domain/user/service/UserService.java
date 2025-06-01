@@ -185,6 +185,10 @@ public class UserService {
         userToBlock.updateStatus(UserStatusEnum.BLOCK);
     }
 
+    public long getTotalUserCnt() {
+        return userRepository.count();
+    }
+
     @Transactional
     public boolean isUserNameExist(String username) {
 

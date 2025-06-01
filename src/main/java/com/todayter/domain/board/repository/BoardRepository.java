@@ -13,6 +13,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespositoryCustom {
 
+    long count();
+
+    long countByApprovedTrue();
+
+    long countByApprovedFalse();
+
     Page<Board> findAllByType(Board.BoardType type, Pageable pageable);
 
     Page<Board> findAllByTypeAndRegion(Board.BoardType type, String region, Pageable pageable);

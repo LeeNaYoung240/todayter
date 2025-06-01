@@ -6,11 +6,9 @@ import com.todayter.domain.comment.dto.CommentRequestDto;
 import com.todayter.domain.comment.dto.CommentResponseDto;
 import com.todayter.domain.comment.entity.Comment;
 import com.todayter.domain.comment.repository.CommentRepository;
-import com.todayter.domain.comment.repository.CommentRepositoryCustom;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
-import com.todayter.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +54,10 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    public long getTotalCommentCnt() {
+        return commentRepository.count();
+    }
+
     private Comment findById(Long commentId) {
 
         return commentRepository.findById(commentId).orElseThrow(
@@ -68,6 +70,5 @@ public class CommentService {
             throw new CustomException(ErrorCode.USER_NOT_MATCH_WITH_COMMENT);
         }
     }
-
 
 }

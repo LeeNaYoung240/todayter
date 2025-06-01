@@ -60,4 +60,11 @@ public class CommentController {
 
     }
 
+    @GetMapping("/comment-cnt")
+    public ResponseEntity<CommonResponseDto<Long>> getCommentCnt() {
+        long totalComments = commentService.getTotalCommentCnt();
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "전체 댓글 수 조회에 성공하였습니다. 🎉", totalComments));
+    }
+
 }
