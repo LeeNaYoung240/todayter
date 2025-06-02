@@ -1,9 +1,6 @@
 package com.todayter.domain.user.service;
 
-import com.todayter.domain.user.dto.EditPasswordRequestDto;
-import com.todayter.domain.user.dto.ProfileResponseDto;
-import com.todayter.domain.user.dto.SignupRequestDto;
-import com.todayter.domain.user.dto.UserResponseDto;
+import com.todayter.domain.user.dto.*;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.domain.user.entity.UserStatusEnum;
@@ -63,6 +60,13 @@ public class UserService {
         userEntity.encryptionPassword(encodedPassword);
 
         userRepository.save(userEntity);
+    }
+
+    @Transactional
+    public void checkUserExistence(CheckUserExistenceRequestDto requestDto) {
+        if (isEmailExist(requestDto.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
     }
 
     @Transactional

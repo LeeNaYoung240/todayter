@@ -68,6 +68,7 @@ public class SecurityConfig {
                                 "/",
                                 "/api/boards/**",
                                 "/api/users/login",
+                                "/api/users/check-existence",
                                 "/api/users/signup",
                                 "/api/users/check-nickname",
                                 "/api/users/check-username",

@@ -41,6 +41,13 @@ public class UserController {
         return new ResponseEntity<>(new CommonResponseDto(201, "회원가입에 성공했습니다. 🎉", null), HttpStatus.CREATED);
     }
 
+    @PostMapping("/check-existence")
+    public ResponseEntity<CommonResponseDto> checkUserExistence(@RequestBody CheckUserExistenceRequestDto requestDto) {
+        userService.checkUserExistence(requestDto);
+
+        return new ResponseEntity<>( new CommonResponseDto(200, "사용 가능한 이메일과 이름입니다. 🎉", null), HttpStatus.OK);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<CommonResponseDto> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
