@@ -145,6 +145,7 @@ public class GoogleService {
                         googleUserInfo.getEmail(),
                         encodedPassword,
                         googleUserInfo.getNickname(),
+                        googleUserInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER
                 );

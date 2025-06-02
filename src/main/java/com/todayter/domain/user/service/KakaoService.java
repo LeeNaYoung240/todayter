@@ -178,6 +178,7 @@ public class KakaoService {
                         kakaoUserInfo.getEmail(),
                         encodedPassword,
                         kakaoUserInfo.getNickname(),
+                        kakaoUserInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER
                 );

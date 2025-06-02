@@ -118,6 +118,7 @@ public class NaverService {
                         userInfo.getEmail(),
                         encodedPassword,
                         userInfo.getNickname(),
+                        userInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER
                 );

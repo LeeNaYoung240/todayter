@@ -10,10 +10,12 @@ public class LoginResponseDto {
 
     private Long userId;
     private String username;
+    private String name;
     private String nickname;
 
     public LoginResponseDto(UserEntity user) {
         this.userId = user.getId();
+        this.name = user.getName();
         this.username = user.getUsername();
         this.nickname = user.getNickname();
     }

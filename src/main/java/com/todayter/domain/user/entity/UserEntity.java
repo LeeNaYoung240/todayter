@@ -22,6 +22,9 @@ public class UserEntity extends TimeStamped {
     @Column
     private String password;
 
+    @Column
+    private String name;
+
     @Column(nullable = false, unique = true)
     private String nickname;
 
@@ -47,11 +50,12 @@ public class UserEntity extends TimeStamped {
         this.role = role;
     }
 
-    public UserEntity(String username, String email, String encodedPassword, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum) {
+    public UserEntity(String username, String email, String encodedPassword, String name, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum) {
         this.username = username;
+        this.email = email;
         this.password = encodedPassword;
         this.nickname = nickname;
-        this.email = email;
+        this.name = name;
         this.status = userStatusEnum;
         this.role = userRoleEnum;
     }
