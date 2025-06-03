@@ -125,6 +125,16 @@ public class GoogleService {
         return new GoogleUserInfoDto(id, name, email);
     }
 
+    private String generateUniqueNickname(String baseNickname) {
+        String nickname = baseNickname;
+        int suffix = 1;
+        while (userRepository.existsByNickname(nickname)) {
+            nickname = baseNickname + suffix;
+            suffix++;
+        }
+        return nickname;
+    }
+
     // 구글 사용자 등록 또는 로그인
     private UserEntity registerGoogleUserIfNeeded(GoogleUserInfoDto googleUserInfo) {
         String socialIdAsUsername  = googleUserInfo.getId();
@@ -139,12 +149,14 @@ public class GoogleService {
             } else {
                 String tempPassword = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(tempPassword);
+                String baseNickname = googleUserInfo.getNickname();
+                String uniqueNickname = generateUniqueNickname(baseNickname);
 
                 googleUser = new UserEntity(
                         socialIdAsUsername,
                         googleUserInfo.getEmail(),
                         encodedPassword,
-                        googleUserInfo.getNickname(),
+                        uniqueNickname,
                         googleUserInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER

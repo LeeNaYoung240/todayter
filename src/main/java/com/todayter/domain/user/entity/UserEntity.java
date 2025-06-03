@@ -50,7 +50,7 @@ public class UserEntity extends TimeStamped {
         this.role = role;
     }
 
-    public UserEntity(String username, String email, String encodedPassword, String name, String nickname, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum) {
+    public UserEntity(String username, String email, String encodedPassword, String nickname, String name, UserStatusEnum userStatusEnum, UserRoleEnum userRoleEnum) {
         this.username = username;
         this.email = email;
         this.password = encodedPassword;

@@ -97,6 +97,16 @@ public class NaverService {
         );
     }
 
+    private String generateUniqueNickname(String baseNickname) {
+        String nickname = baseNickname;
+        int suffix = 1;
+        while (userRepository.existsByNickname(nickname)) {
+            nickname = baseNickname + suffix;
+            suffix++;
+        }
+        return nickname;
+    }
+
     private UserEntity registerIfNeeded(NaverUserInfoDto userInfo) {
         String naverId = userInfo.getId();
 
@@ -113,11 +123,14 @@ public class NaverService {
                 String tempPassword = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(tempPassword);
 
+                String baseNickname = userInfo.getNickname();
+                String uniqueNickname = generateUniqueNickname(baseNickname);
+
                 user = new UserEntity(
                         naverId,
                         userInfo.getEmail(),
                         encodedPassword,
-                        userInfo.getNickname(),
+                        uniqueNickname,
                         userInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER

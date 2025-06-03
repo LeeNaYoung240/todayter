@@ -105,6 +105,16 @@ public class KakaoService {
         return jsonNode.get("access_token").asText();
     }
 
+    private String generateUniqueNickname(String baseNickname) {
+        String nickname = baseNickname;
+        int suffix = 1;
+        while (userRepository.existsByNickname(nickname)) {
+            nickname = baseNickname + suffix;
+            suffix++;
+        }
+        return nickname;
+    }
+
     // access token을 이용해 카카오 사용자 정보 요청
     private KaKaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         URI uri = UriComponentsBuilder
@@ -173,11 +183,14 @@ public class KakaoService {
                 String tempPassword = UUID.randomUUID().toString();
                 String encodedPassword = passwordEncoder.encode(tempPassword);
 
+                String baseNickname = kakaoUserInfo.getNickname();
+                String uniqueNickname = generateUniqueNickname(baseNickname);
+
                 kakaoUser = new UserEntity(
                         kakaoIdAsUsername,
                         kakaoUserInfo.getEmail(),
                         encodedPassword,
-                        kakaoUserInfo.getNickname(),
+                        uniqueNickname,
                         kakaoUserInfo.getNickname(),
                         UserStatusEnum.ACTIVE,
                         UserRoleEnum.USER
