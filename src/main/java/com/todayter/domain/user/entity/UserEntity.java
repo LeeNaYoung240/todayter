@@ -46,6 +46,7 @@ public class UserEntity extends TimeStamped {
         this.email = dto.getEmail();
         this.username = dto.getUsername();
         this.nickname = dto.getNickname();
+        this.name = dto.getName();
         this.status = status;
         this.role = role;
     }

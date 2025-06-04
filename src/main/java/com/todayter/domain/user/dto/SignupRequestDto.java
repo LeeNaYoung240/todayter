@@ -23,6 +23,9 @@ public class SignupRequestDto {
     @Email(message = "이메일 형식으로 입력해 주세요.")
     private String email;
 
+    @NotBlank(message = "이름은 비워둘 수 없습니다.")
+    private String name;
+
     @NotBlank(message = " nickname은 비워둘 수 없습니다.")
     private String nickname;
 
