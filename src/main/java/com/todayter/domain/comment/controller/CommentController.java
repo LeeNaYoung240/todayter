@@ -41,6 +41,13 @@ public class CommentController {
         return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "댓글 조회에 성공하였습니다. 🎉", commentResponseDtos), HttpStatus.OK);
     }
 
+    @GetMapping("/comments")
+    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getAllComments() {
+        List<CommentResponseDto> commentResponseDtos = commentService.getAllComments();
+
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "전체 댓글 조회에 성공하였습니다. 🎉", commentResponseDtos), HttpStatus.OK);
+    }
+
     @PatchMapping("/comments/{commentId}")
     public ResponseEntity<CommonResponseDto> updateComment(@PathVariable Long commentId,
                                                            @Valid @RequestBody CommentRequestDto commentRequestDto,
@@ -58,6 +65,14 @@ public class CommentController {
 
         return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "댓글 삭제에 성공하였습니다. 🎉", null), HttpStatus.OK);
 
+    }
+
+    @DeleteMapping("/admin/comments/{commentId}")
+    public ResponseEntity<CommonResponseDto> deleteCommentByAdmin(@PathVariable Long commentId,
+                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        commentService.deleteCommentByAdmin(commentId, userDetails.getUser());
+
+        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "관리자가 댓글 삭제에 성공하였습니다. 🎉", null), HttpStatus.OK);
     }
 
     @GetMapping("/comment-cnt")

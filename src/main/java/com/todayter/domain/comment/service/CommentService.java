@@ -32,6 +32,14 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
+    public List<CommentResponseDto> getAllComments() {
+        List<Comment> comments = commentRepository.findAll();
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CommentResponseDto> getBoardComments(Long boardId, UserEntity user) {
 
         return commentRepository.getPagedCommentsByBoardAndUser(boardId, user.getId());
@@ -51,6 +59,16 @@ public class CommentService {
     public void deleteComment(Long commentId, UserEntity user) {
         Comment comment = findById(commentId);
         validateUserMatch(comment, user);
+        commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public void deleteCommentByAdmin(Long commentId, UserEntity user) {
+        if(!user.isAdmin())  {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Comment comment = findById(commentId);
         commentRepository.delete(comment);
     }
 
