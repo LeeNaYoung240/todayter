@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/api/boards/**",
+                                "/api/users/user-cnt",
                                 "/api/users/login",
                                 "/api/users/check-existence",
                                 "/api/users/send-Email",

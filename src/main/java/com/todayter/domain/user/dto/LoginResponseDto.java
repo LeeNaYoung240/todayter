@@ -1,6 +1,7 @@
 package com.todayter.domain.user.dto;
 
 import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.entity.UserRoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,12 +13,14 @@ public class LoginResponseDto {
     private String username;
     private String name;
     private String nickname;
+    private UserRoleEnum role;
 
     public LoginResponseDto(UserEntity user) {
         this.userId = user.getId();
         this.name = user.getName();
         this.username = user.getUsername();
         this.nickname = user.getNickname();
+        this.role = user.getRole();
     }
 
 }
