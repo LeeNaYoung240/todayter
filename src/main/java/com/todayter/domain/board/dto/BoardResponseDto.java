@@ -25,6 +25,7 @@ public class BoardResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String imageUrl;
+    private boolean approved;
 
     public BoardResponseDto(Board board) {
         this.boardId = board.getId();
@@ -44,6 +45,7 @@ public class BoardResponseDto {
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
         this.imageUrl = board.getImageUrl();
+        this.approved = board.isApproved();
     }
 
 }

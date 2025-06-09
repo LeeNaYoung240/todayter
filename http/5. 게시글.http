@@ -71,12 +71,17 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 #### 5-9. 게시글 검색(키워드 넣어서)
-GET http://localhost:8081/api/boards/search?keyword=바보&page=1&size=10
+GET http://localhost:8081/api/boards/search?keyword=익산&page=1&size=10
 Content-Type: application/json
 Authorization: {{access_token}}
 
 #### 5-10. 게시글 승인
 PATCH http://localhost:8081/api/boards/4/approve
+Content-Type: application/json
+Authorization: {{access_token}}
+
+#### 5-10. 게시글 승인 취소
+PATCH http://localhost:8081/api/boards/11/disapprove
 Content-Type: application/json
 Authorization: {{access_token}}
 

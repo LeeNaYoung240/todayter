@@ -138,6 +138,14 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인이 완료되었습니다. ✅", responseDto));
     }
 
+    @PatchMapping("/{boardId}/disapprove")
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> disapproveBoard(@PathVariable Long boardId,
+                                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        BoardResponseDto responseDto = boardService.disapproveBoard(boardId, userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인 취소가 완료되었습니다. ❌", responseDto));
+    }
+
     @GetMapping("/ranking")
     public ResponseEntity<CommonResponseDto<List<Long>>> getTopSchedules() {
         List<Long> ranking = boardRankingDao.getRanking();

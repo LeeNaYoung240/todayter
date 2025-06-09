@@ -183,6 +183,25 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
+    @Transactional
+    public BoardResponseDto disapproveBoard(Long boardId, UserEntity adminUser) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!adminUser.isAdmin()) {
+            throw new CustomException(ErrorCode.ADMIN_ACCESS);
+        }
+
+        if (!board.isApproved()) {
+            throw new CustomException(ErrorCode.BOARD_ALREADY_DISAPPROVED);
+        }
+
+        board.setApproved(false);
+        boardRepository.save(board);
+
+        return new BoardResponseDto(board);
+    }
+
     public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 

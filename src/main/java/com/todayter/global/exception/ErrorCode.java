@@ -26,15 +26,15 @@ public enum ErrorCode {
     NEW_PASSWORD_CANNOT_BE_SAME_AS_OLD(500, "새 비밀번호는 현재 비밀번호와 같을 수 없습니다."),
     DUPLICATE_EMAIL(404, "이미 존재하는 이메일입니다."),
     NOT_ACCESS(404, "접근 권한이 없습니다."),
-    ALREADY_ADMIN(404,"이미 관리자 권한을 가지고 있습니다."),
+    ALREADY_ADMIN(404, "이미 관리자 권한을 가지고 있습니다."),
 
     // board 관련 오류 처리
     BOARD_NOT_FOUND(404, "존재하지 않는 게시글입니다."),
     SORT_NOT_FOUND(404, "찾을 수 없는 정렬입니다."),
     SECTION_TYPE_NOT_FOUND(404, "섹션 타입을 찾을 수 없습니다."),
     UNAUTHORIZED(404, "권환이 없습니다."),
-    USER_NOT_MATCH_WITH_BOARD(404,"해당 게시글의 작성자가 아니면 수정할 수 없습니다."),
-    ADMIN_ACCESS(404,"관리자만 승인할 수 있습니다."),
+    USER_NOT_MATCH_WITH_BOARD(404, "해당 게시글의 작성자가 아니면 수정할 수 없습니다."),
+    ADMIN_ACCESS(404, "관리자만 승인할 수 있습니다."),
 
     // Redis 관련 오류 처리
     REDIS_NOT_CONNECT(500, "레디스 서버에 연결할 수 없습니다."),
@@ -49,8 +49,8 @@ public enum ErrorCode {
     ALREADY_LIKED(409, "이미 좋아요를 누른 게시글입니다."),
     LIKE_NOT_EXIST(404, "좋아요가 존재하지 않습니다."),
     CANNOT_CANCEL_OTHERS_LIKE(403, "다른 사람의 좋아요는 취소할 수 없습니다."),
-    LIKE_NOT_FOUND(404, "해당 게시글에 좋아요를 누른 기록이 없습니다.")
-    ;
+    LIKE_NOT_FOUND(404, "해당 게시글에 좋아요를 누른 기록이 없습니다."),
+    BOARD_ALREADY_DISAPPROVED(404, "이미 승인 취소된 게시글입니다.");
 
     private int status;
     private String message;

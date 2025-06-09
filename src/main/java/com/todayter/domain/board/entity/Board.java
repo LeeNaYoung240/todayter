@@ -24,7 +24,6 @@ public class Board extends TimeStamped {
     @Column
     private String subTitle;
 
-    @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
     private String contents;
 
