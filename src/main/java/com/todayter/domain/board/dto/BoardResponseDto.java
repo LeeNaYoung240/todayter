@@ -9,7 +9,11 @@ import java.time.LocalDateTime;
 public class BoardResponseDto {
 
     private Long boardId;
+    private String username;
+    private String name;
+    private String email;
     private String title;
+    private String subTitle;
     private String content;
     private String region;
     private String type;
@@ -20,11 +24,16 @@ public class BoardResponseDto {
     private Long hourHits;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private String imageUrl;
 
     public BoardResponseDto(Board board) {
         this.boardId = board.getId();
         this.title = board.getTitle();
+        this.subTitle = board.getSubTitle();
         this.content = board.getContents();
+        this.name = board.getUser().getName();
+        this.username = board.getUser().getUsername();
+        this.email = board.getUser().getEmail();
         this.region = board.getRegion();
         this.category = board.getCategory();
         this.section = board.getSection();
@@ -34,6 +43,7 @@ public class BoardResponseDto {
         this.hits = board.getHits();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
+        this.imageUrl = board.getImageUrl();
     }
 
 }

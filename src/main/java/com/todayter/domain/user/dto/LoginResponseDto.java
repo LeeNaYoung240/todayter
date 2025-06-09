@@ -13,11 +13,13 @@ public class LoginResponseDto {
     private String username;
     private String name;
     private String nickname;
+    private String email;
     private UserRoleEnum role;
 
     public LoginResponseDto(UserEntity user) {
         this.userId = user.getId();
         this.name = user.getName();
+        this.email = user.getEmail();
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.role = user.getRole();

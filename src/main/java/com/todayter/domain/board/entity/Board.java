@@ -21,8 +21,15 @@ public class Board extends TimeStamped {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column
+    private String subTitle;
+
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String contents;
+
+    @Column(length = 2048, nullable = true)
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -62,6 +69,7 @@ public class Board extends TimeStamped {
 
     public Board(UserEntity user, BoardRequestDto requestDto, BoardType type) {
         this.title = requestDto.getTitle();
+        this.subTitle = requestDto.getSubTitle();
         this.contents = requestDto.getContent();
         this.user = user;
         this.type = type;
@@ -74,6 +82,10 @@ public class Board extends TimeStamped {
         } else if (type == BoardType.SECTION) {
             this.section = requestDto.getSection();
         }
+
+        this.imageUrl = (requestDto.getImageUrl() != null && !requestDto.getImageUrl().isEmpty())
+                ? requestDto.getImageUrl()
+                : "/Logo.png";
     }
 
     public void addLikeCnt() {

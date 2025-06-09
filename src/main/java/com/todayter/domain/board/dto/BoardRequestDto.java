@@ -11,9 +11,10 @@ public class BoardRequestDto {
     @Size(max = 100, message = "제목은 최대 100자까지만 입력이 가능합니다.")
     private String title;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    @Size(max = 10000, message = "내용은 최대 10,000자까지 입력 가능합니다.")
+    @Size(max = 100, message = "부제목은 최대 1000자까지만 입력이 가능합니다.")
+    private String subTitle;
+
+    @Size(max = 1000000, message = "내용은 최대 1,000,000자까지 입력 가능합니다.")
     private String content;
 
     private String region;
@@ -21,5 +22,8 @@ public class BoardRequestDto {
     private String category;
 
     private String section;
+
+    @Column(length = 2048)
+    private String imageUrl;
 
 }

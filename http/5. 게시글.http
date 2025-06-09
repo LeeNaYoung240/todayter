@@ -5,6 +5,7 @@ Authorization: {{access_token}}
 
 {
   "title" : "금세 바보 테스트1",
+  "subTitle" : "부제목",
   "content" : "나는 나영",
   "category": "지역별",
   "region": "익산"
@@ -17,6 +18,7 @@ Authorization: {{access_token}}
 
 {
   "title" : "금세 바보 테스트2",
+  "subTitle" : "부제목",
   "content" : "테스트2",
   "category": "분야별",
   "section": "정치"

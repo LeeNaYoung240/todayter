@@ -148,6 +148,7 @@ public class BoardService {
 
         return boards.map(board -> new BoardSummaryDto(
                 board.getTitle(),
+                board.getSubTitle(),
                 board.getContents(),
                 board.getCategory(),
                 board.getUser().getNickname(),
@@ -225,4 +226,5 @@ public class BoardService {
     public void deleteAllHourHits() {
         boardRepository.deleteAllHourHits();
     }
+
 }
