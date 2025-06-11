@@ -26,6 +26,7 @@ public class BoardResponseDto {
     private LocalDateTime modifiedAt;
     private String imageUrl;
     private boolean approved;
+    private Boolean pick;
 
     public BoardResponseDto(Board board) {
         this.boardId = board.getId();
@@ -46,6 +47,7 @@ public class BoardResponseDto {
         this.modifiedAt = board.getModifiedAt();
         this.imageUrl = board.getImageUrl();
         this.approved = board.isApproved();
+        this.pick = board.getPick();
     }
 
 }

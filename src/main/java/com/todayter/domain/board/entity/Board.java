@@ -115,6 +115,7 @@ public class Board extends TimeStamped {
 
     public void update(BoardUpdateRequestDto dto) {
         this.title = dto.getTitle();
+        this.subTitle = dto.getSubTitle();
         this.contents = dto.getContent();
     }
 
