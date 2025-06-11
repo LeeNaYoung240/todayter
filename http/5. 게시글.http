@@ -80,13 +80,19 @@ PATCH http://localhost:8081/api/boards/4/approve
 Content-Type: application/json
 Authorization: {{access_token}}
 
-#### 5-10. 게시글 승인 취소
+#### 5-10-1. 승인된 게시글 조회
+GET http://localhost:8081/api/boards/approved?page=1&size=10
+
+#### 5-11. 게시글 승인 취소
 PATCH http://localhost:8081/api/boards/11/disapprove
 Content-Type: application/json
 Authorization: {{access_token}}
 
-#### 5-11. 5개 인기 랭킹 조회
+#### 5-11-1. 미승인된 게시글 조회
+GET http://localhost:8081/api/boards/unapproved?page=1&size=10
+
+#### 5-12. 5개 인기 랭킹 조회
 GET http://localhost:8081/api/boards/ranking
 
-#### 5-12. 10개 인기 검색어
+#### 5-13. 10개 인기 검색어
 GET http://localhost:8081/api/boards/popular-keywords

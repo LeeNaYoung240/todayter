@@ -41,4 +41,8 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
 
     Page<Board> findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(String title, String contents, Pageable pageable);
 
+    Page<Board> findAllByApprovedTrue(Pageable pageable);
+
+    Page<Board> findAllByApprovedFalse(Pageable pageable);
+
 }

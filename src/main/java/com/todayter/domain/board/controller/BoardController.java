@@ -138,12 +138,30 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인이 완료되었습니다. ✅", responseDto));
     }
 
+    @GetMapping("/approved")
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getApprovedBoards(@RequestParam(value = "page") int page,
+                                                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Page<BoardResponseDto> boards = boardService.getApprovedBoards(page - 1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "승인된 기사 목록 조회에 성공하였습니다. 🎉", boards));
+    }
+
     @PatchMapping("/{boardId}/disapprove")
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> disapproveBoard(@PathVariable Long boardId,
                                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
         BoardResponseDto responseDto = boardService.disapproveBoard(boardId, userDetails.getUser());
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 승인 취소가 완료되었습니다. ❌", responseDto));
+    }
+
+    @GetMapping("/unapproved")
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getUnapprovedBoards(@RequestParam(value = "page") int page,
+                                                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Page<BoardResponseDto> boards = boardService.getUnapprovedBoards(page - 1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "미승인 기사 목록 조회에 성공하였습니다. 🎉", boards));
     }
 
     @GetMapping("/ranking")

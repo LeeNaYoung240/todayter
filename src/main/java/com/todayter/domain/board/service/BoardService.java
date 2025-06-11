@@ -202,6 +202,22 @@ public class BoardService {
         return new BoardResponseDto(board);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getApprovedBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        return boardRepository.findAllByApprovedTrue(pageable)
+                .map(BoardResponseDto::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getUnapprovedBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+
+        return boardRepository.findAllByApprovedFalse(pageable)
+                .map(BoardResponseDto::new);
+    }
+
     public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
