@@ -258,8 +258,15 @@ public class BoardService {
                 .orElse(Collections.emptyList());
     }
 
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getPopularBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("hits")));
+        Page<Board> boards = boardRepository.findAllByApprovedTrue(pageable);
+
+        return boards.map(BoardResponseDto::new);
+    }
+
     public void deleteAllHourHits() {
         boardRepository.deleteAllHourHits();
     }
-
 }

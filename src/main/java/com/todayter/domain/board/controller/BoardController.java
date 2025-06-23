@@ -199,4 +199,12 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "인기 검색어 10개 조회에 성공하였습니다. 🎉", popular));
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getPopularBoard(@RequestParam(value = "page") int page,
+                                                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<BoardResponseDto> popularBoards = boardService.getPopularBoards(page-1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(),   "인기 게시글 조회에 성공하였습니다. 🎉", popularBoards));
+    }
+
 }
