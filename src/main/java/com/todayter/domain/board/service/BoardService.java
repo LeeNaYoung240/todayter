@@ -77,7 +77,7 @@ public class BoardService {
             if (sectionName == null || sectionName.isEmpty() || "ALL".equalsIgnoreCase(sectionName)) {
                 boards = boardRepository.findAllByType(Board.BoardType.SECTION, pageable);
             } else {
-                boards = boardRepository.findAllByTypeAndCategory(Board.BoardType.SECTION, sectionName, pageable);
+                boards = boardRepository.findAllByTypeAndSection(Board.BoardType.SECTION, sectionName, pageable);
             }
         } else if ("ALL".equalsIgnoreCase(sectionType)) {
             boards = boardRepository.findAll(pageable);

@@ -23,7 +23,8 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
 
     Page<Board> findAllByTypeAndRegion(Board.BoardType type, String region, Pageable pageable);
 
-    Page<Board> findAllByTypeAndCategory(Board.BoardType type, String category, Pageable pageable);
+    Page<Board> findAllByTypeAndSection(Board.BoardType type, String section, Pageable pageable);
+
 
     Page<Board> findAllByPickTrue(Pageable pageable);
 

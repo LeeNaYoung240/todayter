@@ -14,7 +14,7 @@ public class BoardRequestDto {
     @Size(max = 100, message = "부제목은 최대 1000자까지만 입력이 가능합니다.")
     private String subTitle;
 
-    @Size(max = 1000000, message = "내용은 최대 1,000,000자까지 입력 가능합니다.")
+    @Size(max = 5000000, message = "내용은 최대 5,000,000자까지 입력 가능합니다.")
     private String content;
 
     private String region;
