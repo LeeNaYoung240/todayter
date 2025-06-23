@@ -93,7 +93,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(UserEntity user) {
 
-        return new ProfileResponseDto(user.getId(), user.getUsername(), user.getNickname(), user.getStatus(), user.getRole());
+        return new ProfileResponseDto(user.getId(), user.getUsername(), user.getNickname(), user.getName(),user.getStatus(), user.getRole());
     }
 
     @Transactional
