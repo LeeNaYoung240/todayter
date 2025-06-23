@@ -25,7 +25,7 @@ Authorization: {{access_token}}
 }
 
 #### 5-2. 게시글 조회
-GET http://localhost:8081/api/boards/1
+GET http://localhost:8081/api/boards/28
 
 #### 5-3-1. 게시글 섹션별 조회 (지역별)
 GET http://localhost:8081/api/boards/section?page=1&sortBy=createdAt&sectionType=지역별&sectionName=익산
@@ -51,12 +51,12 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 #### 5-6. 게시글 수정
-PATCH http://localhost:8081/api/boards/16
+PATCH http://localhost:8081/api/boards/2
 Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "title" : "수정테스트",
+  "title" : "제목수정합니다15시44분-2",
   "content" : "수정합니다."
 }
 
@@ -71,9 +71,7 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 #### 5-9. 게시글 검색(키워드 넣어서)
-GET http://localhost:8081/api/boards/search?keyword=익산&page=1&size=10
-Content-Type: application/json
-Authorization: {{access_token}}
+GET http://localhost:8081/api/boards/search?keyword=수정&page=1&size=10
 
 #### 5-10. 게시글 승인
 PATCH http://localhost:8081/api/boards/4/approve
@@ -96,3 +94,6 @@ GET http://localhost:8081/api/boards/ranking
 
 #### 5-13. 10개 인기 검색어
 GET http://localhost:8081/api/boards/popular-keywords
+
+#### 5-14 많이 본 게시글 조회
+GET http://localhost:8081/api/boards/popular?page=1&size=10
