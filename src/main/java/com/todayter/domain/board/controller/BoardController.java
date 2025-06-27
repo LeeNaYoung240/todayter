@@ -59,24 +59,24 @@ public class BoardController {
     }
 
     @GetMapping("/pick")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page") int page,
-                                                                                  @RequestParam(value = "sortBy") String sortBy) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page") int page,
+                                                                                          @RequestParam(value = "sortBy") String sortBy) {
 
-        Page<BoardResponseDto> boards = boardService.getPickedBoards(sortBy, page - 1, 5);
+        var boards = boardService.getPickedBoards(sortBy, page - 1, 5);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "Pick 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", boards)
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "Pick 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", new PageResponse<>(boards))
         );
     }
 
     @GetMapping("/section")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getSectionBoards(@RequestParam(value = "page") int page,
-                                                                                      @RequestParam(value = "sortBy") String sortBy,
-                                                                                      @RequestParam(value = "sectionType") String sectionType,
-                                                                                      @RequestParam(value = "sectionName", required = false) String sectionName
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getSectionBoards(@RequestParam(value = "page") int page,
+                                                                                              @RequestParam(value = "sortBy") String sortBy,
+                                                                                              @RequestParam(value = "sectionType") String sectionType,
+                                                                                              @RequestParam(value = "sectionName", required = false) String sectionName
     ) {
-        Page<BoardResponseDto> boards = boardService.getBoardsBySection(sectionType, sectionName, sortBy, page - 1, 10);
+        var boards = boardService.getBoardsBySection(sectionType, sectionName, sortBy, page - 1, 10);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), (sectionName == null || sectionName.isEmpty() ? "전체" : sectionName) + " 섹션 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", boards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), (sectionName == null || sectionName.isEmpty() ? "전체" : sectionName) + " 섹션 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", new PageResponse<>(boards)));
     }
 
     @PatchMapping("/{boardId}/pick")
@@ -92,42 +92,42 @@ public class BoardController {
     }
 
     @GetMapping("/titles")
-    public ResponseEntity<CommonResponseDto<Page<BoardTitleDto>>> getBoardTitles(@RequestParam(value = "page") int page,
-                                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardTitleDto>>> getBoardTitles(@RequestParam(value = "page") int page,
+                                                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<BoardTitleDto> titles = boardService.getBoardTitles(page - 1, size);
+        var titles = boardService.getBoardTitles(page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 제목 목록 조회에 성공하였습니다. 🎉", titles));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 제목 목록 조회에 성공하였습니다. 🎉", new PageResponse<>(titles)));
     }
 
     @GetMapping("/summaries")
-    public ResponseEntity<CommonResponseDto<Page<BoardSummaryDto>>> getBoardSummaries(@RequestParam(value = "page") int page,
-                                                                                      @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardSummaryDto>>> getBoardSummaries(@RequestParam(value = "page") int page,
+                                                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<BoardSummaryDto> summaries = boardService.getBoardSummaries(page - 1, size);
+        var summaries = boardService.getBoardSummaries(page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "요약형 게시글 목록 조회에 성공하였습니다. 🎉", summaries));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "요약형 게시글 목록 조회에 성공하였습니다. 🎉", new PageResponse<>(summaries)));
     }
 
     @GetMapping("/admin")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getMyBoards(@RequestParam(value = "page") int page,
-                                                                                 @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Page<BoardResponseDto> boards = boardService.getBoardsByAdmin(userDetails.getUser(), page - 1, size);
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getMyBoards(@RequestParam(value = "page") int page,
+                                                                                         @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        var boards = boardService.getBoardsByAdmin(userDetails.getUser(), page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "관리자 본인 작성 게시글 조회에 성공하였습니다. 🎉", boards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "관리자 본인 작성 게시글 조회에 성공하였습니다. 🎉", new PageResponse<>(boards)));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> searchBoards(@RequestParam("keyword") String keyword,
-                                                                                  @RequestParam(value = "page") int page,
-                                                                                  @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> searchBoards(@RequestParam("keyword") String keyword,
+                                                                                          @RequestParam(value = "page") int page,
+                                                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
 
         searchKeywordService.recordSearchKeyword(keyword);
 
-        Page<BoardResponseDto> results = boardService.searchBoards(keyword, page - 1, size);
+        var results = boardService.searchBoards(keyword, page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 검색에 성공하였습니다. 🎉", results));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 검색에 성공하였습니다. 🎉", new PageResponse<>(results)));
     }
 
     @PatchMapping("/{boardId}/approve")
@@ -139,13 +139,14 @@ public class BoardController {
     }
 
     @GetMapping("/approved")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getApprovedBoards(@RequestParam(value = "page") int page,
-                                                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getApprovedBoards(@RequestParam(value = "page") int page,
+                                                                                               @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<BoardResponseDto> boards = boardService.getApprovedBoards(page - 1, size);
+        var boards = boardService.getApprovedBoards(page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "승인된 기사 목록 조회에 성공하였습니다. 🎉", boards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "승인된 기사 목록 조회에 성공하였습니다. 🎉", new PageResponse<>(boards)));
     }
+
 
     @PatchMapping("/{boardId}/disapprove")
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> disapproveBoard(@PathVariable Long boardId,
@@ -156,12 +157,12 @@ public class BoardController {
     }
 
     @GetMapping("/unapproved")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getUnapprovedBoards(@RequestParam(value = "page") int page,
-                                                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getUnapprovedBoards(@RequestParam(value = "page") int page,
+                                                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        Page<BoardResponseDto> boards = boardService.getUnapprovedBoards(page - 1, size);
+        var boards = boardService.getUnapprovedBoards(page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "미승인 기사 목록 조회에 성공하였습니다. 🎉", boards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "미승인 기사 목록 조회에 성공하였습니다. 🎉", new PageResponse<>(boards)));
     }
 
     @GetMapping("/ranking")
@@ -200,11 +201,11 @@ public class BoardController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<CommonResponseDto<Page<BoardResponseDto>>> getPopularBoard(@RequestParam(value = "page") int page,
-                                                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
-        Page<BoardResponseDto> popularBoards = boardService.getPopularBoards(page-1, size);
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getPopularBoard(@RequestParam(value = "page") int page,
+                                                                                             @RequestParam(value = "size", defaultValue = "10") int size) {
+        var popularBoards = boardService.getPopularBoards(page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(),   "인기 게시글 조회에 성공하였습니다. 🎉", popularBoards));
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "인기 게시글 조회에 성공하였습니다. 🎉", new PageResponse<>(popularBoards)));
     }
 
 }
