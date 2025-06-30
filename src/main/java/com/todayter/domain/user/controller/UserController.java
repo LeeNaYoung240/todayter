@@ -1,9 +1,9 @@
 package com.todayter.domain.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.todayter.domain.user.dto.*;
 import com.todayter.domain.user.entity.UserEntity;
-import com.todayter.domain.user.service.*;
+import com.todayter.domain.user.service.EmailService;
+import com.todayter.domain.user.service.UserService;
 import com.todayter.global.dto.CommonResponseDto;
 import com.todayter.global.security.UserDetailsImpl;
 import io.netty.handler.codec.MessageAggregationException;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -28,10 +27,27 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final KakaoService kakaoService;
-    private final NaverService naverService;
-    private final GoogleService googleService;
     private final EmailService emailService;
+
+    @GetMapping("/me")
+    public ResponseEntity<CommonResponseDto> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommonResponseDto(401, "인증되지 않은 사용자입니다.", null));
+        }
+
+        UserEntity user = userDetails.getUser();
+        UserInfoResponseDto userInfo = new UserInfoResponseDto(
+                user.getName(),
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "사용자 정보 조회 성공했습니다. 🎉", userInfo));
+    }
+
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto> signup(@RequestBody SignupRequestDto signupDto) {
@@ -124,30 +140,6 @@ public class UserController {
         userService.blockUser(userId, user);
 
         return ResponseEntity.ok(new CommonResponseDto(200, "회원 차단에 성공하였습니다. 🎉", null));
-    }
-
-
-    @GetMapping("/login/oauth2/code/kakao")
-    public ResponseEntity<CommonResponseDto> kakaoLogin(@RequestParam String code,
-                                                        HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
-        List<String> kakaoToken = kakaoService.kakaoLogin(code, response);
-
-        return ResponseEntity.ok(new CommonResponseDto(200, "카카오 로그인 성공", kakaoToken));
-    }
-
-    @GetMapping("/oauth/naver/callback")
-    public ResponseEntity<CommonResponseDto> naverLogin(@RequestParam String code,
-                                                        @RequestParam String state,
-                                                        HttpServletResponse response) throws JsonProcessingException {
-        List<String> naverToken = naverService.naverLogin(code, state, response);
-        return ResponseEntity.ok(new CommonResponseDto(200, "네이버 로그인 성공", naverToken));
-    }
-
-    @GetMapping("/login/oauth2/code/google")
-    public ResponseEntity<CommonResponseDto> googleLogin(@RequestParam String code,
-                                                         HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
-        List<String> googleToken = googleService.googleLogin(code, response);
-        return ResponseEntity.ok(new CommonResponseDto(200, "구글 로그인 성공", googleToken));
     }
 
     @PostMapping("/send-Email")
