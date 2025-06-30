@@ -6,16 +6,27 @@ import com.todayter.domain.user.entity.UserStatusEnum;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails, OAuth2User {
 
     private final UserEntity user;
+    private Map<String, Object> attributes; // OAuth2 속성 저장
 
+    // 기본 생성자 (일반 로그인용)
     public UserDetailsImpl(UserEntity user) {
         this.user = user;
+    }
+
+    // OAuth2용 생성자
+    public UserDetailsImpl(UserEntity user, Map<String, Object> attributes) {
+        this.user = user;
+        this.attributes = attributes;
     }
 
     // 사용자 정보 반환
@@ -23,28 +34,35 @@ public class UserDetailsImpl implements UserDetails {
         return user;
     }
 
-    // 사용자 이름(ID) 반환
+    // OAuth2User 인터페이스 구현
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes != null ? attributes : Collections.emptyMap();
+    }
+
+    @Override
+    public String getName() {
+        return user.getUsername();
+    }
+
+    // UserDetails 인터페이스 구현
     @Override
     public String getUsername() {
         return user.getUsername();
     }
 
-    // 사용자 비밀번호 반환
     @Override
     public String getPassword() {
         return user.getPassword();
     }
 
-    // 계정 만료 여부 확인
     @Override
     public boolean isAccountNonExpired() {
-        return true; // 계정 만료 기능 없음
+        return true;
     }
 
-    // 사용자 권한 반환
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         UserRoleEnum role = user.getRole();
         String roleString = "ROLE_" + role.getAuthority();
 
@@ -55,21 +73,18 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
-    // 계정 차단 여부
     @Override
     public boolean isAccountNonLocked() {
-        return !user.getStatus().equals(UserStatusEnum.BLOCK); // 차단된 계정이면 false
+        return !user.getStatus().equals(UserStatusEnum.BLOCK);
     }
 
-    //비밀번호 만료 여부
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // 비밀번호 만료 기능 없음
+        return true;
     }
 
-    // 계정 활성화 여부
     @Override
     public boolean isEnabled() {
-        return !user.getStatus().equals(UserStatusEnum.WITHDRAW); // 탈퇴한 계정이면 false
+        return !user.getStatus().equals(UserStatusEnum.WITHDRAW);
     }
 }

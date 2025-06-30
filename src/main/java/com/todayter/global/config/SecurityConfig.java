@@ -2,6 +2,9 @@ package com.todayter.global.config;
 
 import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.jwt.JwtProvider;
+import com.todayter.global.oauth2.handler.OAuth2FailureHandler;
+import com.todayter.global.oauth2.handler.OAuth2SuccessHandler;
+import com.todayter.global.oauth2.service.CustomOAuth2UserService;
 import com.todayter.global.security.JwtAuthenticationFilter;
 import com.todayter.global.security.JwtAuthorizationFilter;
 import com.todayter.global.security.UserDetailsServiceImpl;
@@ -14,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,14 +35,27 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    public CustomOAuth2UserService customOAuth2UserService(PasswordEncoder passwordEncoder) {
+        return new CustomOAuth2UserService(userRepository, passwordEncoder);
+    }
 
+    @Bean
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
+        return new OAuth2SuccessHandler(jwtProvider, userRepository);
+    }
+
+    @Bean
+    public OAuth2FailureHandler oAuth2FailureHandler() {
+        return new OAuth2FailureHandler();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-
         return configuration.getAuthenticationManager();
     }
 
@@ -46,20 +63,16 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider, userRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-
         return new JwtAuthorizationFilter(jwtProvider, userDetailsService);
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -76,23 +89,24 @@ public class SecurityConfig {
                                 "/api/users/check-nickname",
                                 "/api/users/check-username",
                                 "/login/oauth2/code/**",
-                                "/api/users/oauth/naver/callback",
-                                "/api/users/login/oauth2/code/google",
-                                "/api/users/login/oauth2/code/kakao",
                                 "/oauth2/authorization/**"
                         ).permitAll()
-
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/api/users/*/block").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService(bCryptPasswordEncoder()))
+                        )
+                        .successHandler(oAuth2SuccessHandler())
+                        .failureHandler(oAuth2FailureHandler()));
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
-
     }
 
     // Cors 설정
@@ -111,5 +125,4 @@ public class SecurityConfig {
 
         return source;
     }
-
 }
