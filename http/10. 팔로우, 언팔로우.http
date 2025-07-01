@@ -30,7 +30,9 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "following": 8
+  "following": 8,
+  "gender": "FEMALE",
+  "age": 25
 }
 
 ### 3-4. 언팔로우 요청 (USER_1 → USER_2)

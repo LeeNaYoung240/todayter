@@ -42,6 +42,11 @@ public class UserEntity extends TimeStamped {
     @Column(nullable = false)
     private UserStatusEnum status;
 
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    private Integer age;
+
     public UserEntity(SignupRequestDto dto, UserStatusEnum status, UserRoleEnum role) {
         this.email = dto.getEmail();
         this.username = dto.getUsername();
@@ -89,6 +94,10 @@ public class UserEntity extends TimeStamped {
         return this.role != null && this.role.getAuthority().equals(role);
     }
 
+    public enum Gender {
+        MALE, FEMALE
+    }
+
     public boolean isAdmin() {
         return this.getRole() == UserRoleEnum.ADMIN;
     }
@@ -99,6 +108,15 @@ public class UserEntity extends TimeStamped {
 
     public void setRole(UserRoleEnum role) {
         this.role = role;
+    }
+
+    public void updateProfile(Gender gender, Integer age) {
+        if (gender != null) {
+            this.gender = gender;
+        }
+        if (age != null) {
+            this.age = age;
+        }
     }
 
 }

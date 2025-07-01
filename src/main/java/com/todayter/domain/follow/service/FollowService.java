@@ -37,6 +37,9 @@ public class FollowService {
             throw new CustomException(ErrorCode.ALREADY_FOLLOWING);
         }
 
+        follower.updateProfile(followRequestDto.getGender(), followRequestDto.getAge());
+        userRepository.save(follower);
+
         Follow follow = new Follow(follower, following);
         Follow savedFollow = followRepository.save(follow);
 
