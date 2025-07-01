@@ -89,7 +89,8 @@ public class SecurityConfig {
                                 "/api/users/check-nickname",
                                 "/api/users/check-username",
                                 "/login/oauth2/code/**",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+                                "/api/follows/**"
                         ).permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/api/users/*/block").hasRole("ADMIN")
