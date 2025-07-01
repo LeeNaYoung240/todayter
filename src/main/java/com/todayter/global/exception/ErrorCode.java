@@ -50,7 +50,12 @@ public enum ErrorCode {
     LIKE_NOT_EXIST(404, "좋아요가 존재하지 않습니다."),
     CANNOT_CANCEL_OTHERS_LIKE(403, "다른 사람의 좋아요는 취소할 수 없습니다."),
     LIKE_NOT_FOUND(404, "해당 게시글에 좋아요를 누른 기록이 없습니다."),
-    BOARD_ALREADY_DISAPPROVED(404, "이미 승인 취소된 게시글입니다.");
+    BOARD_ALREADY_DISAPPROVED(404, "이미 승인 취소된 게시글입니다."),
+
+    // Follow 관련 오류 처리
+    INVALID_FOLLOW_REQUEST(404,"자기 자신은 팔로우할 수 없습니다." ),
+    ALREADY_FOLLOWING(404, "이미 팔로우중입니다."),
+    FOLLOW_NOT_FOUND(404, "팔로우하고 있지 않습니다." );
 
     private int status;
     private String message;
