@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -32,6 +35,13 @@ public class Comment extends TimeStamped {
     @Column(nullable = false)
     private Long likeCnt = 0L;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade =  CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies = new ArrayList<>();
+
     public void addLikeCnt() {
         this.likeCnt++;
     }
@@ -40,10 +50,11 @@ public class Comment extends TimeStamped {
         this.likeCnt--;
     }
 
-    public Comment(CommentRequestDto commentRequestDto, Board board, UserEntity user) {
+    public Comment(CommentRequestDto commentRequestDto, Board board, UserEntity user, Comment parent) {
         this.content = commentRequestDto.getContent();
         this.board = board;
         this.user = user;
+        this.parent = parent;
     }
 
     public void update(CommentRequestDto commentRequestDto) {

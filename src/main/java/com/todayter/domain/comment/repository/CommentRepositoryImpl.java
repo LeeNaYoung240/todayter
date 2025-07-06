@@ -34,8 +34,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     public List<CommentResponseDto> getPagedCommentsByBoard(Long boardId) {
         QComment comment = QComment.comment;
 
+
         List<Comment> comments = jpaQueryFactory.selectFrom(comment)
-                .where(comment.board.id.eq(boardId))
+                .where(comment.board.id.eq(boardId)
+                        .and(comment.parent.isNull()))
                 .orderBy(comment.createdAt.desc())
                 .fetch();
 
@@ -43,5 +45,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
     }
+
 
 }

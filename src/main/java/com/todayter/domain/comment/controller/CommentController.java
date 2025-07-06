@@ -34,11 +34,15 @@ public class CommentController {
     }
 
     @GetMapping("{boardId}/comments")
-    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getBoardComments(@PathVariable Long boardId) {
-        List<CommentResponseDto> commentResponseDtos = commentService.getBoardComments(boardId);
+    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getBoardComments(@PathVariable Long boardId,
+                                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        Long userId = userDetails != null ? userDetails.getUser().getId() : null;
+        List<CommentResponseDto> commentResponseDtos = commentService.getBoardComments(boardId, userId);
 
         return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "댓글 조회에 성공하였습니다. 🎉", commentResponseDtos), HttpStatus.OK);
     }
+
 
     @GetMapping("/comments")
     public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getAllComments() {
