@@ -1,14 +1,15 @@
-#### 7-1. 댓글 등록
-POST http://localhost:8081/api/boards/2/comments
+#### 7-1. 댓글 등록(parentId 생략 가능)
+POST http://localhost:8081/api/boards/41/comments
 Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "content": "문어"
+  "content": "문어",
+  "parentId": 8
 }
 
 #### 7-2-1. 댓글 단건 조회
-GET http://localhost:8081/api/boards/1/comments
+GET http://localhost:8081/api/boards/41/comments
 Content-Type: application/json
 Authorization: {{access_token}}
 
