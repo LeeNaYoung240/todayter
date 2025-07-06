@@ -29,4 +29,19 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<CommentResponseDto> getPagedCommentsByBoard(Long boardId) {
+        QComment comment = QComment.comment;
+
+        List<Comment> comments = jpaQueryFactory.selectFrom(comment)
+                .where(comment.board.id.eq(boardId))
+                .orderBy(comment.createdAt.desc())
+                .fetch();
+
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
 }

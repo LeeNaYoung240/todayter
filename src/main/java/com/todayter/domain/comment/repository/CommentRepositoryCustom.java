@@ -9,5 +9,6 @@ import java.util.List;
 public interface CommentRepositoryCustom {
 
     List<CommentResponseDto> getPagedCommentsByBoardAndUser (Long scheduleId, Long userId);
+    List<CommentResponseDto> getPagedCommentsByBoard(Long boardId);
 
 }

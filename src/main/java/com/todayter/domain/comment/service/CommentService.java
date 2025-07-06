@@ -39,10 +39,10 @@ public class CommentService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<CommentResponseDto> getBoardComments(Long boardId, UserEntity user) {
+    @Transactional
+    public List<CommentResponseDto> getBoardComments(Long boardId) {
 
-        return commentRepository.getPagedCommentsByBoardAndUser(boardId, user.getId());
+        return commentRepository.getPagedCommentsByBoard(boardId);
     }
 
     @Transactional

@@ -34,9 +34,8 @@ public class CommentController {
     }
 
     @GetMapping("{boardId}/comments")
-    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getBoardComments(@PathVariable Long boardId,
-                                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<CommentResponseDto> commentResponseDtos = commentService.getBoardComments(boardId, userDetails.getUser());
+    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getBoardComments(@PathVariable Long boardId) {
+        List<CommentResponseDto> commentResponseDtos = commentService.getBoardComments(boardId);
 
         return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "댓글 조회에 성공하였습니다. 🎉", commentResponseDtos), HttpStatus.OK);
     }
