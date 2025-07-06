@@ -2,18 +2,18 @@ package com.todayter.domain.like.service;
 
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
-import com.todayter.domain.board.service.BoardService;
 import com.todayter.domain.like.dto.LikeResponseDto;
 import com.todayter.domain.like.entity.Like;
 import com.todayter.domain.like.repository.LikeRepository;
 import com.todayter.domain.user.entity.UserEntity;
-import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class LikeService {
 
         board.addLikeCnt();
 
-        return new LikeResponseDto(like, true);
+        return new LikeResponseDto(like, true, board.getLikeCnt());
     }
 
     @Transactional
@@ -54,17 +54,23 @@ public class LikeService {
         likeRepository.delete(foundLike);
         foundBoard.minusLikeCount();
 
-        return new LikeResponseDto(null, false);
+        return new LikeResponseDto(null, false, foundBoard.getLikeCnt());
     }
 
     public LikeResponseDto getLike(Long boardId, UserEntity user) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-        Like like = likeRepository.findByBoardAndUser(board, user)
-                .orElseThrow(() -> new CustomException(ErrorCode.LIKE_NOT_FOUND));
+        Optional<Like> likeOpt = likeRepository.findByBoardAndUser(board, user);
 
-        return new LikeResponseDto(like, false);
+       if(likeOpt.isPresent()) {
+
+           return new LikeResponseDto(likeOpt.get(), true, board.getLikeCnt());
+       }
+       else {
+
+           return new LikeResponseDto(null, false, board.getLikeCnt());
+       }
     }
 
 }
