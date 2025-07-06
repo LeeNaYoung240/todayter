@@ -29,6 +29,17 @@ public class Comment extends TimeStamped {
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
+    @Column(nullable = false)
+    private Long likeCnt = 0L;
+
+    public void addLikeCnt() {
+        this.likeCnt++;
+    }
+
+    public void minusLikeCnt() {
+        this.likeCnt--;
+    }
+
     public Comment(CommentRequestDto commentRequestDto, Board board, UserEntity user) {
         this.content = commentRequestDto.getContent();
         this.board = board;
