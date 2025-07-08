@@ -13,13 +13,15 @@ public class ProfileResponseDto {
     private String nickname;
     private UserStatusEnum status;
     private UserRoleEnum role;
+    private String email;
 
-    public ProfileResponseDto(Long id, String username,String name, String nickname, UserStatusEnum status, UserRoleEnum role) {
+    public ProfileResponseDto(Long id, String username,String name, String nickname, UserStatusEnum status, UserRoleEnum role, String email) {
         this.id = id;
         this.username = username;
-        this.name = name;
         this.nickname = nickname;
+        this.name = name;
         this.status = status;
         this.role = role;
+        this.email = email;
     }
 }
