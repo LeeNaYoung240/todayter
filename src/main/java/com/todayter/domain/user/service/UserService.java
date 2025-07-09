@@ -1,5 +1,6 @@
 package com.todayter.domain.user.service;
 
+import com.todayter.domain.follow.repository.FollowRepository;
 import com.todayter.domain.user.dto.*;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
@@ -24,6 +25,7 @@ import java.util.List;
 public class UserService {
 
     private final JwtProvider jwtProvider;
+    private final FollowRepository followRepository;
     @Value("${ADMIN_TOKEN}")
     private String ADMIN_TOKEN;
 
@@ -93,7 +95,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(UserEntity user) {
 
-        return new ProfileResponseDto(user.getId(), user.getUsername(), user.getName(), user.getNickname(),user.getStatus(), user.getRole(), user.getEmail());
+        int followerCnt = followRepository.countByFollowing(user);
+
+        return new ProfileResponseDto(user.getId(), user.getUsername(), user.getName(), user.getNickname(),user.getStatus(), user.getRole(), user.getEmail(), followerCnt );
     }
 
     @Transactional
@@ -162,17 +166,24 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers(UserEntity currentUser) {
-
-        if (!currentUser.getRole().equals(UserRoleEnum.ADMIN)) {
+       /* if (!currentUser.getRole().equals(UserRoleEnum.ADMIN)) {
             throw new CustomException(ErrorCode.NOT_ACCESS);
         }
-
+*/
         List<UserEntity> users = userRepository.findAll();
 
+        // 각 유저별 팔로잉(내가 팔로우하는 유저 id 목록) 조회
         return users.stream()
-                .map(UserResponseDto::new)
+                .map(user -> {
+                    List<Long> followingIds = followRepository.findAllByFollower(user)
+                            .stream()
+                            .map(follow -> follow.getFollowing().getId())
+                            .toList();
+                    return new UserResponseDto(user, followingIds);
+                })
                 .toList();
     }
+
 
     @Transactional
     public void blockUser(Long userId, UserEntity userDetails) {
