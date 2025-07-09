@@ -1,10 +1,14 @@
 package com.todayter.domain.user.entity;
 
+import com.todayter.domain.follow.entity.Follow;
 import com.todayter.domain.user.dto.SignupRequestDto;
 import com.todayter.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -46,6 +50,10 @@ public class UserEntity extends TimeStamped {
     private Gender gender;
 
     private Integer age;
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();
+
 
     public UserEntity(SignupRequestDto dto, UserStatusEnum status, UserRoleEnum role) {
         this.email = dto.getEmail();
@@ -118,5 +126,10 @@ public class UserEntity extends TimeStamped {
             this.age = age;
         }
     }
+
+    public int getFollowerCnt() {
+        return followers != null ? followers.size() : 0;
+    }
+
 
 }

@@ -27,6 +27,8 @@ public class BoardResponseDto {
     private String imageUrl;
     private boolean approved;
     private Boolean pick;
+    private Long userId;
+    private Integer followerCnt;
 
     public BoardResponseDto(Board board) {
         this.boardId = board.getId();
@@ -48,6 +50,8 @@ public class BoardResponseDto {
         this.imageUrl = board.getImageUrl();
         this.approved = board.isApproved();
         this.pick = board.getPick();
+        this.userId = board.getUser().getId();
+        this.followerCnt = board.getUser().getFollowerCnt();
     }
 
 }
