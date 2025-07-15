@@ -60,11 +60,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // 현재 인증된 사용자의 정보 저장
     public void setAuthentication(String username) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
+
 
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
