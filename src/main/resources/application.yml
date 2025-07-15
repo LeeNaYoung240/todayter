@@ -95,11 +95,11 @@ cloud:
       static: ${AWS_REGION}
       auto: false
 
-  stack:
-    auto: false
+    stack:
+      auto: false
 
-  s3:
-    bucket: ${AWS_BUCKET_NAME}
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
 
 server:
   port: 8081
