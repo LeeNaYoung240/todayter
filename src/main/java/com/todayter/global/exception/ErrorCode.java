@@ -56,7 +56,17 @@ public enum ErrorCode {
     INVALID_FOLLOW_REQUEST(404,"자기 자신은 팔로우할 수 없습니다." ),
     ALREADY_FOLLOWING(404, "이미 팔로우중입니다."),
     FOLLOW_NOT_FOUND(404, "팔로우하고 있지 않습니다." ),
-    INVALID_PARENT_COMMENT(404, "부모 댓글이 해당 게시글에 속하지 않습니다.");
+    INVALID_PARENT_COMMENT(404, "부모 댓글이 해당 게시글에 속하지 않습니다."),
+
+    //s3
+    PUT_OBJECT_EXCEPTION(500, "s3 업로드에 문제가 발생했습니다."),
+    FILE_NAME_INVALID(400, "잘못된 파일명입니다."),
+    EXTENSION_IS_EMPTY(404, "파일을 찾을 수 없습니다."),
+    EXTENSION_INVALID(404, "잘못된 확장자명입니다."),
+    IO_EXCEPTION_ON_IMAGE_DELETE(404, "업로드에 문제가 발생했습니다."),
+    NULL_MULTIPART_FILES_EXCEPTION(404, "파일 업로드 요청에서 파일이 포함되지 않았습니다. 파일을 선택하고 다시 시도하십시오."),
+
+    ;
 
     private int status;
     private String message;
