@@ -3,17 +3,18 @@ package com.todayter.domain.board.service;
 import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
+import com.todayter.domain.file.entity.File;
+import com.todayter.domain.file.service.FileService;
+import com.todayter.domain.follow.repository.FollowRepository;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,74 +24,94 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final FileService fileService;
+    private final FollowRepository followRepository;
 
     @Transactional
-    public BoardResponseDto createBoard(UserEntity user, BoardRequestDto requestDto) {
-
-        Board.BoardType type;
-
-        if ("지역별".equals(requestDto.getCategory())) {
-            type = Board.BoardType.LOCAL;
-        } else if ("분야별".equals(requestDto.getCategory())) {
-            type = Board.BoardType.SECTION;
-        } else {
-            type = Board.BoardType.NORMAL;
-        }
+    public BoardResponseDto createBoard(UserEntity user, BoardRequestDto requestDto, List<MultipartFile> multipartFiles) {
+        Board.BoardType type = switch (requestDto.getCategory()) {
+            case "지역별" -> Board.BoardType.LOCAL;
+            case "분야별" -> Board.BoardType.SECTION;
+            default -> Board.BoardType.NORMAL;
+        };
 
         Board board = new Board(user, requestDto, type);
+
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            List<File> files = fileService.uploadFile(multipartFiles);
+            board.getFiles().addAll(files);
+        }
+
         boardRepository.save(board);
 
-        return new BoardResponseDto(board);
+        Board loadedBoard = boardRepository.findByIdWithUserAndFollowers(board.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        int followerCnt = followRepository.countByFollowing(loadedBoard.getUser());
+        return new BoardResponseDto(loadedBoard, followerCnt);
     }
 
     @Transactional
     public BoardResponseDto getBoard(Long boardId) {
-        Board board = findById(boardId);
+        Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
         boardRepository.updateHits(boardId);
         boardRepository.updateHourHits(boardId);
-        return new BoardResponseDto(board);
+
+        int followerCnt = followRepository.countByFollowing(board.getUser());
+        return new BoardResponseDto(board, followerCnt);
     }
 
-    @Transactional(readOnly = true)
-    public Page<BoardResponseDto> getBoardsBySection(String sectionType, String sectionName, String sortBy, int page, int size) {
-        Sort sort;
+    @Transactional
+    public BoardResponseDto updateBoard(Long boardId, BoardUpdateRequestDto dto,
+                                        List<MultipartFile> newImages, UserEntity user) {
+        Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-        if ("createdAt".equals(sortBy)) {
-            sort = Sort.by(Sort.Order.desc("createdAt"));
-        } else if ("likeCount".equals(sortBy)) {
-            sort = Sort.by(Sort.Order.desc("likeCount"));
-        } else {
-            throw new CustomException(ErrorCode.SORT_NOT_FOUND);
+        validateUserMatch(board, user);
+        board.update(dto);
+
+        if (newImages != null && !newImages.isEmpty()) {
+            List<File> newFiles = fileService.uploadFile(newImages);
+            board.getFiles().addAll(newFiles);
         }
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Board> boards;
+        int followerCnt = followRepository.countByFollowing(board.getUser());
+        return new BoardResponseDto(board, followerCnt);
+    }
 
-        if ("지역별".equals(sectionType)) {
-            if (sectionName == null || sectionName.isEmpty() || "ALL".equalsIgnoreCase(sectionName)) {
-                boards = boardRepository.findAllByType(Board.BoardType.LOCAL, pageable);
-            } else {
-                boards = boardRepository.findAllByTypeAndRegion(Board.BoardType.LOCAL, sectionName, pageable);
-            }
-        } else if ("분야별".equals(sectionType)) {
-            if (sectionName == null || sectionName.isEmpty() || "ALL".equalsIgnoreCase(sectionName)) {
-                boards = boardRepository.findAllByType(Board.BoardType.SECTION, pageable);
-            } else {
-                boards = boardRepository.findAllByTypeAndSection(Board.BoardType.SECTION, sectionName, pageable);
-            }
-        } else if ("ALL".equalsIgnoreCase(sectionType)) {
-            boards = boardRepository.findAll(pageable);
-        } else {
-            throw new CustomException(ErrorCode.SECTION_TYPE_NOT_FOUND);
-        }
+    @Transactional
+    public BoardResponseDto approveBoard(Long boardId, UserEntity adminUser) {
+        Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
-        return boards.map(BoardResponseDto::new);
+        if (!adminUser.isAdmin()) throw new CustomException(ErrorCode.ADMIN_ACCESS);
+        board.setApproved(true);
+        boardRepository.save(board);
+
+        int followerCnt = followRepository.countByFollowing(board.getUser());
+        return new BoardResponseDto(board, followerCnt);
+    }
+
+    @Transactional
+    public BoardResponseDto disapproveBoard(Long boardId, UserEntity adminUser) {
+        Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+
+        if (!adminUser.isAdmin()) throw new CustomException(ErrorCode.ADMIN_ACCESS);
+        if (!board.isApproved()) throw new CustomException(ErrorCode.BOARD_ALREADY_DISAPPROVED);
+
+        board.setApproved(false);
+        boardRepository.save(board);
+
+        int followerCnt = followRepository.countByFollowing(board.getUser());
+        return new BoardResponseDto(board, followerCnt);
     }
 
     @Transactional
     public BoardResponseDto setPick(Long boardId, boolean pick, UserEntity user) {
-        Board board = boardRepository.findById(boardId)
+        Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
         if (!user.hasRole(UserRoleEnum.Authority.ADMIN)) {
@@ -98,40 +119,19 @@ public class BoardService {
         }
         board.setPick(pick);
 
-        return new BoardResponseDto(board);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<BoardResponseDto> getPickedBoards(String sortBy, int page, int size) {
-        Sort sort;
-
-        if ("createdAt".equals(sortBy)) {
-            sort = Sort.by(Sort.Order.desc("createdAt"));
-        } else if ("likeCount".equals(sortBy)) {
-            sort = Sort.by(Sort.Order.desc("likeCount"));
-        } else {
-            throw new CustomException(ErrorCode.SORT_NOT_FOUND);
-        }
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Board> boards = boardRepository.findAllByPickTrue(pageable);
-
-        return boards.map(BoardResponseDto::new);
-    }
-
-    @Transactional
-    public BoardResponseDto updateBoard(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto, UserEntity user) {
-        Board board = findById(boardId);
-        validateUserMatch(board, user);
-        board.update(boardUpdateRequestDto);
-
-        return new BoardResponseDto(board);
+        int followerCnt = followRepository.countByFollowing(board.getUser());
+        return new BoardResponseDto(board, followerCnt);
     }
 
     @Transactional
     public void deleteBoard(Long boardId, UserEntity user) {
-        Board board = findById(boardId);
+        Board board = findById(boardId); // 이건 사용 안 되면 제거해도 됨
         validateUserMatch(board, user);
+
+        for (File file : board.getFiles()) {
+            fileService.deleteFile(file.getFileUrl());
+        }
+
         boardRepository.delete(board);
     }
 
@@ -139,21 +139,24 @@ public class BoardService {
     public Page<BoardTitleDto> getBoardTitles(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
 
-        return boardRepository.findAll(pageable).map(board -> new BoardTitleDto(board.getTitle()));
+        return boardRepository.findAll(pageable)
+                .map(BoardTitleDto::new);
     }
 
+
+    @Transactional(readOnly = true)
     public Page<BoardSummaryDto> getBoardSummaries(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        Page<Board> boards = boardRepository.findAll(pageable);
-
-        return boards.map(board -> new BoardSummaryDto(
-                board.getTitle(),
-                board.getSubTitle(),
-                board.getContents(),
-                board.getCategory(),
-                board.getUser().getNickname(),
-                board.getCreatedAt()
-        ));
+        return boardRepository.findAll(pageable).map(board ->
+                new BoardSummaryDto(
+                        board.getTitle(),
+                        board.getSubTitle(),
+                        board.getContents(),
+                        board.getCategory(),
+                        board.getUser().getNickname(),
+                        board.getCreatedAt()
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -163,66 +166,72 @@ public class BoardService {
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        Page<Board> boards = boardRepository.findAllByUser(user, pageable);
-
-        return boards.map(BoardResponseDto::new);
+        return boardRepository.findAllByUser(user, pageable)
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
-    @Transactional
-    public BoardResponseDto approveBoard(Long boardId, UserEntity adminUser) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getPickedBoards(String sortBy, int page, int size) {
+        Sort sort = sortBy.equals("likeCount")
+                ? Sort.by(Sort.Order.desc("likeCount"))
+                : Sort.by(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        if (!adminUser.isAdmin()) {
-            throw new CustomException(ErrorCode.ADMIN_ACCESS);
-        }
-
-        board.setApproved(true);
-        boardRepository.save(board);
-
-        return new BoardResponseDto(board);
-    }
-
-    @Transactional
-    public BoardResponseDto disapproveBoard(Long boardId, UserEntity adminUser) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-
-        if (!adminUser.isAdmin()) {
-            throw new CustomException(ErrorCode.ADMIN_ACCESS);
-        }
-
-        if (!board.isApproved()) {
-            throw new CustomException(ErrorCode.BOARD_ALREADY_DISAPPROVED);
-        }
-
-        board.setApproved(false);
-        boardRepository.save(board);
-
-        return new BoardResponseDto(board);
+        return boardRepository.findAllByPickTrue(pageable)
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
     @Transactional(readOnly = true)
     public Page<BoardResponseDto> getApprovedBoards(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-
         return boardRepository.findAllByApprovedTrue(pageable)
-                .map(BoardResponseDto::new);
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
     @Transactional(readOnly = true)
     public Page<BoardResponseDto> getUnapprovedBoards(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-
         return boardRepository.findAllByApprovedFalse(pageable)
-                .map(BoardResponseDto::new);
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
-    public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getBoardsBySection(String sectionType, String sectionName, String sortBy, int page, int size) {
+        Sort sort = "likeCount".equals(sortBy)
+                ? Sort.by(Sort.Order.desc("likeCount"))
+                : Sort.by(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Board> boards;
 
-        return boardRepository.findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(keyword, keyword, pageRequest)
-                .map(BoardResponseDto::new);
+        if ("지역별".equals(sectionType)) {
+            boards = sectionName == null || sectionName.equals("ALL")
+                    ? boardRepository.findAllByType(Board.BoardType.LOCAL, pageable)
+                    : boardRepository.findAllByTypeAndRegion(Board.BoardType.LOCAL, sectionName, pageable);
+        } else if ("분야별".equals(sectionType)) {
+            boards = sectionName == null || sectionName.equals("ALL")
+                    ? boardRepository.findAllByType(Board.BoardType.SECTION, pageable)
+                    : boardRepository.findAllByTypeAndSection(Board.BoardType.SECTION, sectionName, pageable);
+        } else if ("ALL".equalsIgnoreCase(sectionType)) {
+            boards = boardRepository.findAll(pageable);
+        } else {
+            throw new CustomException(ErrorCode.SECTION_TYPE_NOT_FOUND);
+        }
+
+        return boards.map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getPopularBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("hits")));
+        return boardRepository.findAllByApprovedTrue(pageable)
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return boardRepository.findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(keyword, keyword, pageable)
+                .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
     public long getTotalBoardCnt() {
@@ -237,36 +246,24 @@ public class BoardService {
         return boardRepository.countByApprovedFalse();
     }
 
-    @Transactional(readOnly = true)
-    public Board findById(Long boardId) {
-
-        return boardRepository.findById(boardId).orElseThrow(
-                () -> new CustomException(ErrorCode.BOARD_NOT_FOUND)
-        );
-    }
-
     private void validateUserMatch(Board board, UserEntity user) {
         if (!board.getUser().getId().equals(user.getId())) {
             throw new CustomException(ErrorCode.USER_NOT_MATCH_WITH_BOARD);
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<Long> getRanking() {
-
-        return boardRepository.getBoardIdRanking()
-                .orElse(Collections.emptyList());
-    }
-
-    @Transactional(readOnly = true)
-    public Page<BoardResponseDto> getPopularBoards(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("hits")));
-        Page<Board> boards = boardRepository.findAllByApprovedTrue(pageable);
-
-        return boards.map(BoardResponseDto::new);
-    }
-
     public void deleteAllHourHits() {
         boardRepository.deleteAllHourHits();
+    }
+
+    // 미사용 시 제거 가능
+    @Transactional(readOnly = true)
+    public Board findById(Long boardId) {
+        return boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getRanking() {
+        return boardRepository.getBoardIdRanking().orElse(Collections.emptyList());
     }
 }

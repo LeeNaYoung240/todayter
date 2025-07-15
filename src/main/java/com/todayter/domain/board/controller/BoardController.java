@@ -9,9 +9,11 @@ import com.todayter.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,14 +26,16 @@ public class BoardController {
     private final BoardRankingDao boardRankingDao;
     private final SearchKeywordService searchKeywordService;
 
-    @PostMapping()
-    public ResponseEntity<CommonResponseDto<BoardResponseDto>> addBoard(@RequestBody BoardRequestDto requestDto,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponseDto<BoardResponseDto>> addBoard(@RequestPart("requestDto") BoardRequestDto requestDto,
+                                                                        @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles,
                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        BoardResponseDto responseDto = boardService.createBoard(userDetails.getUser(), requestDto);
+
+        BoardResponseDto responseDto = boardService.createBoard(userDetails.getUser(), requestDto, multipartFiles);
 
         return new ResponseEntity<>(new CommonResponseDto<>(201, "게시글 생성에 성공하였습니다. 🎉", responseDto), HttpStatus.CREATED);
-
     }
+
 
     @GetMapping("/{boardId}")
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> getBoard(@PathVariable Long boardId) {
@@ -40,14 +44,17 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "일정 단건 조회에 성공하였습니다. 🎉", responseDto));
     }
 
-    @PatchMapping("/{boardId}")
+    @PatchMapping(value = "/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> updateBoard(@PathVariable Long boardId,
-                                                                           @Valid @RequestBody BoardUpdateRequestDto boardUpdateRequestDto,
+                                                                           @RequestPart("boardUpdateRequestDto") @Valid BoardUpdateRequestDto boardUpdateRequestDto,
+                                                                           @RequestPart(value = "images", required = false) List<MultipartFile> images,
                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        BoardResponseDto responseDto = boardService.updateBoard(boardId, boardUpdateRequestDto, userDetails.getUser());
+
+        BoardResponseDto responseDto = boardService.updateBoard(boardId, boardUpdateRequestDto, images, userDetails.getUser());
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 수정에 성공하였습니다. 🎉", responseDto));
     }
+
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> deleteBoard(@PathVariable Long boardId,

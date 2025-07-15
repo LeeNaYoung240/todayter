@@ -23,7 +23,4 @@ public class BoardRequestDto {
 
     private String section;
 
-    @Column(length = 2048)
-    private String imageUrl;
-
 }

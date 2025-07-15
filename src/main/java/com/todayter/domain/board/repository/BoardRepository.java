@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespositoryCustom {
 
@@ -46,4 +48,11 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
 
     Page<Board> findAllByApprovedFalse(Pageable pageable);
 
+    @Query("""
+                SELECT b FROM Board b
+                JOIN FETCH b.user u
+                LEFT JOIN FETCH u.followers
+                WHERE b.id = :boardId
+            """)
+    Optional<Board> findByIdWithUserAndFollowers(@Param("boardId") Long boardId);
 }

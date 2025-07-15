@@ -1,9 +1,11 @@
 package com.todayter.domain.board.dto;
 
 import com.todayter.domain.board.entity.Board;
+import com.todayter.domain.file.entity.File;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class BoardResponseDto {
@@ -24,13 +26,13 @@ public class BoardResponseDto {
     private Long hourHits;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-    private String imageUrl;
+    private List<String> imageUrl;
     private boolean approved;
     private Boolean pick;
     private Long userId;
     private Integer followerCnt;
 
-    public BoardResponseDto(Board board) {
+    public BoardResponseDto(Board board, int followerCnt) {
         this.boardId = board.getId();
         this.title = board.getTitle();
         this.subTitle = board.getSubTitle();
@@ -47,11 +49,14 @@ public class BoardResponseDto {
         this.hits = board.getHits();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-        this.imageUrl = board.getImageUrl();
+        this.imageUrl = board.getFiles().stream()
+                .map(File::getFileUrl)
+                .toList();
         this.approved = board.isApproved();
         this.pick = board.getPick();
         this.userId = board.getUser().getId();
-        this.followerCnt = board.getUser().getFollowerCnt();
+        this.followerCnt = followerCnt;
+
     }
 
 }

@@ -2,11 +2,15 @@ package com.todayter.domain.board.entity;
 
 import com.todayter.domain.board.dto.BoardRequestDto;
 import com.todayter.domain.board.dto.BoardUpdateRequestDto;
+import com.todayter.domain.file.entity.File;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.global.entity.TimeStamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +31,9 @@ public class Board extends TimeStamped {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String contents;
 
-    @Column(length = 2048, nullable = true)
-    private String imageUrl;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "board_id")
+    private List<File> files = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -81,10 +86,6 @@ public class Board extends TimeStamped {
         } else if (type == BoardType.SECTION) {
             this.section = requestDto.getSection();
         }
-
-        this.imageUrl = (requestDto.getImageUrl() != null && !requestDto.getImageUrl().isEmpty())
-                ? requestDto.getImageUrl()
-                : "/Logo.png";
     }
 
     public void addLikeCnt() {
