@@ -17,10 +17,10 @@ public class CommentResponseDto {
     private LocalDateTime modifiedAt;
     private Long parentId;
     private List<CommentResponseDto> replies;
-
     private Long likeCount;
     private Boolean isLiked;
     private Long likeId;
+    private String profileImageUrl;
 
     public CommentResponseDto(Comment comment, Long likeId) {
         this.commentId = comment.getId();
@@ -37,6 +37,12 @@ public class CommentResponseDto {
 
         this.likeCount = comment.getLikeCnt();
 
+        if (comment.getUser().getProfileImage() != null) {
+            this.profileImageUrl = comment.getUser().getProfileImage().getFileUrl();
+        } else {
+            this.profileImageUrl = null;
+        }
+
         if (likeId != null) {
             this.isLiked = true;
             this.likeId = likeId;
@@ -48,20 +54,6 @@ public class CommentResponseDto {
 
     public CommentResponseDto(Comment comment) {
         this(comment, null);
-    }
-
-    public CommentResponseDto(CommentResponseDto original, Long likeId) {
-        this.commentId = original.getCommentId();
-        this.boardId = original.getBoardId();
-        this.nickname = original.getNickname();
-        this.content = original.getContent();
-        this.createdAt = original.getCreatedAt();
-        this.modifiedAt = original.getModifiedAt();
-        this.parentId = original.getParentId();
-        this.replies = original.getReplies();
-        this.likeCount = original.getLikeCount();
-        this.isLiked = likeId != null;
-        this.likeId = likeId;
     }
 
 }
