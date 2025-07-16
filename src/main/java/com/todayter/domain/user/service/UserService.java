@@ -1,5 +1,7 @@
 package com.todayter.domain.user.service;
 
+import com.todayter.domain.file.entity.File;
+import com.todayter.domain.file.service.FileService;
 import com.todayter.domain.follow.repository.FollowRepository;
 import com.todayter.domain.user.dto.*;
 import com.todayter.domain.user.entity.UserEntity;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
     private final FollowRepository followRepository;
+    private final FileService fileService;
     @Value("${ADMIN_TOKEN}")
     private String ADMIN_TOKEN;
 
@@ -94,10 +98,45 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public ProfileResponseDto getProfile(UserEntity user) {
+        int followerCnt = followRepository.countByFollowing(user);
+
+        String profileImageUrl = null;
+        File profileImage = user.getProfileImage();
+        if (profileImage != null) {
+            // 💡 트랜잭션 내에서 LAZY 필드 값 강제 로딩
+            profileImageUrl = profileImage.getFileUrl();
+        }
+
+        return new ProfileResponseDto(
+                user.getId(), user.getUsername(), user.getName(), user.getNickname(),
+                user.getStatus(), user.getRole(), user.getEmail(), followerCnt, profileImageUrl
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileResponseDto getPublicProfile(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         int followerCnt = followRepository.countByFollowing(user);
 
-        return new ProfileResponseDto(user.getId(), user.getUsername(), user.getName(), user.getNickname(),user.getStatus(), user.getRole(), user.getEmail(), followerCnt );
+        String profileImageUrl = null;
+        File profileImage = user.getProfileImage();
+        if (profileImage != null) {
+            profileImageUrl = profileImage.getFileUrl();
+        }
+
+        return new ProfileResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getNickname(),
+                user.getStatus(),
+                user.getRole(),
+                user.getEmail(),
+                followerCnt,
+                profileImageUrl
+        );
     }
 
     @Transactional
@@ -200,6 +239,25 @@ public class UserService {
         userToBlock.updateStatus(UserStatusEnum.BLOCK);
     }
 
+    @Transactional
+    public String uploadProfileImage(UserEntity user, MultipartFile multipartFile) {
+        File file = fileService.uploadFile(List.of(multipartFile)).get(0);
+        user.updateProfileImage(file);
+        userRepository.save(user);
+
+        return file.getFileUrl();
+    }
+
+    @Transactional
+    public void deleteProfileImage(UserEntity user) {
+        File profileImage = user.getProfileImage();
+        if (profileImage != null) {
+            fileService.deleteFile(profileImage.getFileUrl());
+            user.updateProfileImage(null);
+            userRepository.save(user);
+        }
+    }
+
     public long getTotalUserCnt() {
         return userRepository.count();
     }
@@ -234,5 +292,6 @@ public class UserService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
+
 
 }

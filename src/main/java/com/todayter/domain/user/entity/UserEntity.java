@@ -1,5 +1,6 @@
 package com.todayter.domain.user.entity;
 
+import com.todayter.domain.file.entity.File;
 import com.todayter.domain.follow.entity.Follow;
 import com.todayter.domain.user.dto.SignupRequestDto;
 import com.todayter.global.entity.TimeStamped;
@@ -54,6 +55,9 @@ public class UserEntity extends TimeStamped {
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followers = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_image_id")
+    private File profileImage;
 
     public UserEntity(SignupRequestDto dto, UserStatusEnum status, UserRoleEnum role) {
         this.email = dto.getEmail();
@@ -127,8 +131,12 @@ public class UserEntity extends TimeStamped {
         }
     }
 
-    public int getFollowerCnt() {
-        return followers != null ? followers.size() : 0;
+    public void updateProfileImage(File file) {
+        this.profileImage = file;
+    }
+
+    public File getProfileImage() {
+        return profileImage;
     }
 
 

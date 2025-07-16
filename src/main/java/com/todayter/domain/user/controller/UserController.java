@@ -12,16 +12,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
@@ -61,7 +62,7 @@ public class UserController {
     public ResponseEntity<CommonResponseDto> checkUserExistence(@RequestBody CheckUserExistenceRequestDto requestDto) {
         userService.checkUserExistence(requestDto);
 
-        return new ResponseEntity<>( new CommonResponseDto(200, "사용 가능한 이메일과 이름입니다. 🎉", null), HttpStatus.OK);
+        return new ResponseEntity<>(new CommonResponseDto(200, "사용 가능한 이메일과 이름입니다. 🎉", null), HttpStatus.OK);
     }
 
     @PostMapping("/logout")
@@ -84,10 +85,40 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<CommonResponseDto> getProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
 
+        if (userDetails == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommonResponseDto(401, "인증되지 않은 사용자입니다.", null));
+        }
+
         ProfileResponseDto profileResponseDto = userService.getProfile(userDetails.getUser());
 
         return ResponseEntity.ok(new CommonResponseDto(200, "프로필 조회에 성공하였습니다. 🎉", profileResponseDto));
     }
+
+    @GetMapping("/public-profile/{userId}")
+    public ResponseEntity<CommonResponseDto> getPublicProfile(@PathVariable Long userId) {
+        ProfileResponseDto profile = userService.getPublicProfile(userId);
+
+        return ResponseEntity.ok(new CommonResponseDto(200, "공개 프로필 조회 성공 🎉", profile));
+    }
+
+
+    @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponseDto<String>> uploadProfileImage(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                        @RequestPart("file") MultipartFile file) {
+
+        String fileUrl = userService.uploadProfileImage(userDetails.getUser(), file);
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "프로필 이미지 업로드 성공", fileUrl));
+    }
+
+    @DeleteMapping("/profile-image")
+    public ResponseEntity<CommonResponseDto<String>> deleteProfileImage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.deleteProfileImage(userDetails.getUser());
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "프로필 이미지 삭제 완료", null));
+    }
+
 
     @PatchMapping("/profiles/nickname")
     public ResponseEntity<CommonResponseDto> updateNickname(@AuthenticationPrincipal UserDetailsImpl userDetails,
