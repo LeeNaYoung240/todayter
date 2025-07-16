@@ -56,34 +56,23 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> getBoardComments(Long boardId, Long userId) {
-        // 1) 댓글 목록을 DTO로 바로 받음
-        List<CommentResponseDto> commentResponseDtos = commentRepository.getPagedCommentsByBoard(boardId);
+        List<Comment> comments = commentRepository.getCommentsWithUserProfileImageByBoard(boardId);
 
-        if (userId == null) {
-            return commentResponseDtos;
-        }
+        List<Long> commentIds = comments.stream().map(Comment::getId).toList();
 
-        // 2) 댓글 ID 목록 추출
-        List<Long> commentIds = commentResponseDtos.stream()
-                .map(CommentResponseDto::getCommentId)
-                .toList();
+        Map<Long, Long> likedCommentMap = userId != null ?
+                commentLikeRepository.findByUserIdAndCommentIds(userId, commentIds)
+                        .stream()
+                        .collect(Collectors.toMap(cl -> cl.getComment().getId(), CommentLike::getId))
+                : Map.of();
 
-        // 3) 로그인 사용자의 좋아요 목록 조회
-        List<CommentLike> userLikes = commentLikeRepository.findByUserIdAndCommentIds(userId, commentIds);
-
-        // 4) 좋아요 Map 생성 (댓글ID -> 좋아요ID)
-        Map<Long, Long> likedCommentMap = userLikes.stream()
-                .collect(Collectors.toMap(cl -> cl.getComment().getId(), CommentLike::getId));
-
-        // 5) 기존 DTO에 좋아요 정보 추가한 새 DTO 리스트 반환
-        return commentResponseDtos.stream()
-                .map(crd -> {
-                    Long likeId = likedCommentMap.get(crd.getCommentId());
-                    return new CommentResponseDto(crd, likeId);
+        return comments.stream()
+                .map(comment -> {
+                    Long likeId = likedCommentMap.get(comment.getId());
+                    return new CommentResponseDto(comment, likeId);
                 })
-                .collect(Collectors.toList());  // 여기 꼭 collect로 리스트 변환
+                .toList();
     }
-
 
     @Transactional
     public CommentResponseDto updateComment(CommentRequestDto commentRequestDto, Long commentId, UserEntity user) {
