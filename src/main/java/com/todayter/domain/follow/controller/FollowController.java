@@ -4,7 +4,10 @@ import com.todayter.domain.follow.dto.FollowRequestDto;
 import com.todayter.domain.follow.dto.FollowResponseDto;
 import com.todayter.domain.follow.service.FollowService;
 import com.todayter.domain.user.entity.UserEntity;
+import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.dto.CommonResponseDto;
+import com.todayter.global.exception.CustomException;
+import com.todayter.global.exception.ErrorCode;
 import com.todayter.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import java.util.List;
 public class FollowController {
 
     private final FollowService followService;
+    private final UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<CommonResponseDto<FollowResponseDto>> createFollow(@RequestBody FollowRequestDto followRequestDto,
@@ -50,10 +54,18 @@ public class FollowController {
     }
 
     @GetMapping("/followers")
-    public ResponseEntity<CommonResponseDto<List<FollowResponseDto>>> getFollowers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<CommonResponseDto<List<FollowResponseDto>>> getFollowers(@RequestParam(value = "targetUserId", required = false) Long targetUserId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserEntity targetUser;
 
-        List<FollowResponseDto> followers = followService.getFollowers(userDetails.getUser());
+        if (targetUserId != null) {
+            targetUser = userRepository.findById(targetUserId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        } else {
+            targetUser = userDetails.getUser();
+        }
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "나를 팔로우한 목록 조회 성공 🎉", followers));
+        List<FollowResponseDto> followers = followService.getFollowers(targetUser);
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "팔로워 조회 성공 🎉", followers));
     }
+
 }
