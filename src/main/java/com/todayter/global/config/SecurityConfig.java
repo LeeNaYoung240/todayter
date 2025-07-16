@@ -8,6 +8,7 @@ import com.todayter.global.oauth2.service.CustomOAuth2UserService;
 import com.todayter.global.security.JwtAuthenticationFilter;
 import com.todayter.global.security.JwtAuthorizationFilter;
 import com.todayter.global.security.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,9 +77,19 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setCharacterEncoding("UTF-8");
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"status\": 401, \"message\": \"인증이 필요합니다.\"}");
+                        })
+                )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/api/users/signup",
                                 "/api/boards/**",
                                 "/api/users/user-cnt",
                                 "/api/users/login",
@@ -103,6 +114,7 @@ public class SecurityConfig {
                         )
                         .successHandler(oAuth2SuccessHandler())
                         .failureHandler(oAuth2FailureHandler()));
+
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

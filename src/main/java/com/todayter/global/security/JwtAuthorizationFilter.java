@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,34 +28,31 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, IOException {
-
-        if ("/api/users/signup".equals(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String tokenValue = jwtProvider.getAccessTokenFromHeader(request);
+        System.out.println("[JWT FILTER] token value = " + tokenValue); // 이 로그 확인!
 
+        // 토큰이 있으면 → 인증 처리
         if (StringUtils.hasText(tokenValue)) {
             try {
-                // JWT 토큰 검증
                 Claims info = jwtProvider.getClaimsFromToken(tokenValue);
                 setAuthentication(info.getSubject());
-
             } catch (CustomException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("text/plain;charset=UTF-8");
-                response.getWriter().write("토큰이 만료되었습니다.");
-
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"status\":401,\"message\":\"토큰이 만료되었습니다.\"}");
                 return;
             } catch (Exception e) {
                 throw new ServletException(e);
             }
         }
-        // 다음 필터로 요청을 전달
+        // 토큰이 없으면, 혹은 permitAll 경로면 → 그냥 다음 필터로
         filterChain.doFilter(request, response);
     }
+
 
     // 현재 인증된 사용자의 정보 저장
     public void setAuthentication(String username) {
