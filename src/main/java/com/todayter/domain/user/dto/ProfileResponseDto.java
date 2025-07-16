@@ -15,8 +15,9 @@ public class ProfileResponseDto {
     private UserRoleEnum role;
     private String email;
     private int followerCnt;
+    private String profileImageUrl;
 
-    public ProfileResponseDto(Long id, String username,String name, String nickname, UserStatusEnum status, UserRoleEnum role, String email, int followerCnt) {
+    public ProfileResponseDto(Long id, String username, String name, String nickname, UserStatusEnum status, UserRoleEnum role, String email, int followerCnt, String profileImageUrl) {
         this.id = id;
         this.username = username;
         this.nickname = nickname;
@@ -25,5 +26,7 @@ public class ProfileResponseDto {
         this.role = role;
         this.email = email;
         this.followerCnt = followerCnt;
+        this.profileImageUrl = profileImageUrl;
     }
+
 }
