@@ -31,6 +31,7 @@ public class BoardResponseDto {
     private Boolean pick;
     private Long userId;
     private Integer followerCnt;
+    private String profileImageUrl;
 
     public BoardResponseDto(Board board, int followerCnt) {
         this.boardId = board.getId();
@@ -56,7 +57,11 @@ public class BoardResponseDto {
         this.pick = board.getPick();
         this.userId = board.getUser().getId();
         this.followerCnt = followerCnt;
+        this.profileImageUrl = null;
 
+        if (board.getUser().getProfileImage() != null) {
+            this.profileImageUrl = board.getUser().getProfileImage().getFileUrl();
+        }
     }
 
 }
