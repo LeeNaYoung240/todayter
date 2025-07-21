@@ -2,6 +2,7 @@ package com.todayter.domain.comment.entity;
 
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.comment.dto.CommentRequestDto;
+import com.todayter.domain.like.entity.CommentLike;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.global.entity.TimeStamped;
 import jakarta.persistence.*;
@@ -41,6 +42,10 @@ public class Comment extends TimeStamped {
 
     @OneToMany(mappedBy = "parent", cascade =  CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> likes = new ArrayList<>();
+
 
     public void addLikeCnt() {
         this.likeCnt++;
