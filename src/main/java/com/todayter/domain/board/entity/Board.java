@@ -118,6 +118,9 @@ public class Board extends TimeStamped {
         this.title = dto.getTitle();
         this.subTitle = dto.getSubTitle();
         this.contents = dto.getContent();
+        this.region = dto.getRegion();
+        this.category = dto.getCategory();
+        this.section = dto.getSection();
     }
 
     public Long getHits() {
