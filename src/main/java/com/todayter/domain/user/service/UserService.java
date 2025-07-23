@@ -4,9 +4,11 @@ import com.todayter.domain.file.entity.File;
 import com.todayter.domain.file.service.FileService;
 import com.todayter.domain.follow.repository.FollowRepository;
 import com.todayter.domain.user.dto.*;
+import com.todayter.domain.user.entity.NicknameChangeLog;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.domain.user.entity.UserStatusEnum;
+import com.todayter.domain.user.repository.NicknameChangeLogRepository;
 import com.todayter.domain.user.repository.UserRepository;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -35,6 +38,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final NicknameChangeLogRepository nicknameChangeLogRepository;
+
 
     @Transactional
     public void signup(SignupRequestDto signupDto) {
@@ -139,19 +144,6 @@ public class UserService {
         );
     }
 
-    @Transactional
-    public ProfileResponseDto updateNickname(UserEntity user, String nickname) {
-
-        if (isNicknameExist(nickname)) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
-        }
-
-        user.updateNickname(nickname);
-        userRepository.save(user);
-
-        return getProfile(user);
-    }
-
     public void updatePassword(UserEntity user, EditPasswordRequestDto editPasswordRequestDto) {
 
         if (!bCryptPasswordEncoder.matches(editPasswordRequestDto.getPassword(), user.getPassword())) {
@@ -205,10 +197,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers(UserEntity currentUser) {
-       /* if (!currentUser.getRole().equals(UserRoleEnum.ADMIN)) {
-            throw new CustomException(ErrorCode.NOT_ACCESS);
-        }
-*/
+
         List<UserEntity> users = userRepository.findAll();
 
         // 각 유저별 팔로잉(내가 팔로우하는 유저 id 목록) 조회
@@ -256,6 +245,29 @@ public class UserService {
             user.updateProfileImage(null);
             userRepository.save(user);
         }
+    }
+
+    @Transactional
+    public ProfileResponseDto updateNickname(UserEntity user, String nickname) {
+
+        if (isNicknameExist(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(30);
+        List<NicknameChangeLog> recentChanges = nicknameChangeLogRepository.findByUserAndChangedAtAfter(user, cutoff);
+        if (recentChanges.size() >= 3) {
+            throw new CustomException(ErrorCode.TOO_MANY_NICKNAME_CHANGES);
+        }
+
+        String oldNickname = user.getNickname();
+        user.updateNickname(nickname);
+        userRepository.save(user);
+
+        NicknameChangeLog log = new NicknameChangeLog(user, oldNickname, nickname);
+        nicknameChangeLogRepository.save(log);
+
+        return getProfile(user);
     }
 
     public long getTotalUserCnt() {

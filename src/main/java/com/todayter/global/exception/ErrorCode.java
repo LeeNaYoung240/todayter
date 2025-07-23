@@ -53,9 +53,9 @@ public enum ErrorCode {
     BOARD_ALREADY_DISAPPROVED(404, "이미 승인 취소된 게시글입니다."),
 
     // Follow 관련 오류 처리
-    INVALID_FOLLOW_REQUEST(404,"자기 자신은 팔로우할 수 없습니다." ),
+    INVALID_FOLLOW_REQUEST(404, "자기 자신은 팔로우할 수 없습니다."),
     ALREADY_FOLLOWING(404, "이미 팔로우중입니다."),
-    FOLLOW_NOT_FOUND(404, "팔로우하고 있지 않습니다." ),
+    FOLLOW_NOT_FOUND(404, "팔로우하고 있지 않습니다."),
     INVALID_PARENT_COMMENT(404, "부모 댓글이 해당 게시글에 속하지 않습니다."),
 
     //s3
@@ -66,6 +66,7 @@ public enum ErrorCode {
     IO_EXCEPTION_ON_IMAGE_DELETE(404, "업로드에 문제가 발생했습니다."),
     NULL_MULTIPART_FILES_EXCEPTION(404, "파일 업로드 요청에서 파일이 포함되지 않았습니다. 파일을 선택하고 다시 시도하십시오."),
 
+    TOO_MANY_NICKNAME_CHANGES(404, "닉네임은 30일 내에 최대 3회까지 변경할 수 있습니다."),
     ;
 
     private int status;
