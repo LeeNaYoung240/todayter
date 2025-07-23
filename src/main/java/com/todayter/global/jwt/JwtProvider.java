@@ -126,13 +126,17 @@ public class JwtProvider {
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 
-        // Authorization 헤더가 없거나 Bearer 접두어가 아닌 경우 예외 처리
-        if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+        if (!StringUtils.hasText(authorizationHeader)) {
             return null;
         }
-
-        return authorizationHeader.substring(7);  // "Bearer " 이후의 토큰 반환
+        // Bearer 있으면 제거, 없으면 그대로
+        if (authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return authorizationHeader.substring(7);
+        } else {
+            return authorizationHeader;
+        }
     }
+
 
     // JWT 토큰에서 클레임 추출 메서드
     public Claims getClaimsFromToken(String token) {

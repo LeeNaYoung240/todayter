@@ -12,6 +12,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -39,9 +41,24 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // 응답 설정
         response.addHeader("Authorization", "Bearer " + accessToken);
         jwtProvider.addRefreshTokenToCookie(response, refreshToken);
-        response.setStatus(HttpServletResponse.SC_OK);
 
-        response.sendRedirect("http://localhost:3000/main");
+        // 사용자 정보 포함한 redirect URL 생성
+        String redirectUrl = String.format(
+                "http://localhost:3000/oauth2/redirect?access_token=%s&name=%s&email=%s&role=%s",
+                urlEncode(accessToken),
+                urlEncode(user.getNickname()),
+                urlEncode(user.getEmail()),
+                urlEncode(user.getRole().name())
+        );
+        response.sendRedirect(redirectUrl);
 
+    }
+
+    private String urlEncode(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
