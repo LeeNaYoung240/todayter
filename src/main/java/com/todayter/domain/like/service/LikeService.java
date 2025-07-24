@@ -73,4 +73,11 @@ public class LikeService {
        }
     }
 
+    public Long getLikeCount(Long boardId) {
+        if (!boardRepository.existsById(boardId)) {
+            throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
+        }
+        return likeRepository.countByBoardId(boardId);
+    }
+
 }

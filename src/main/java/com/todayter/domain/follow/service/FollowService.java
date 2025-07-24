@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -71,6 +73,35 @@ public class FollowService {
         return followRepository.findAllByFollowing(user).stream()
                 .map(FollowResponseDto::new)
                 .collect(toList());
+    }
+
+    public Long getFollowerCount(Long targetUserId) {
+
+        return followRepository.countByFollowingId(targetUserId);
+    }
+
+    public Map<String, Long> getFollowerGenderStats(Long userId) {
+        List<Object[]> results = followRepository.countFollowerGenderByUserId(userId);
+        Map<String, Long> genderStats = new HashMap<>();
+        for (Object[] row : results) {
+            String gender = row[0] != null ? row[0].toString() : "UNKNOWN";
+            Long count = (Long) row[1];
+            genderStats.put(gender, count);
+        }
+
+        return genderStats;
+    }
+
+    public Map<Integer, Long> getFollowerAgeStats(Long userId) {
+        List<Object[]> results = followRepository.countFollowerAgeByUserId(userId);
+        Map<Integer, Long> ageStats = new HashMap<>();
+        for (Object[] row : results) {
+            Integer age = (Integer) row[0];
+            Long count = (Long) row[1];
+            ageStats.put(age, count);
+        }
+
+        return ageStats;
     }
 
 }

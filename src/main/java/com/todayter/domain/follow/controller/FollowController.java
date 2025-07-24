@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,11 +62,39 @@ public class FollowController {
             targetUser = userRepository.findById(targetUserId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         } else {
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new CommonResponseDto<>(401, "로그인이 필요한 요청입니다.", null));
+            }
             targetUser = userDetails.getUser();
         }
 
         List<FollowResponseDto> followers = followService.getFollowers(targetUser);
+
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "팔로워 조회 성공 🎉", followers));
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<CommonResponseDto<Long>> getFollowerCount(@RequestParam("targetUserId") Long targetUserId) {
+        long count = followService.getFollowerCount(targetUserId);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "팔로워 수 조회 성공 🎉", count));
+    }
+
+    @GetMapping("/followers/gender-stats")
+    public ResponseEntity<CommonResponseDto<Map<String, Long>>> getFollowerGenderStats(@RequestParam("targetUserId") Long targetUserId) {
+
+        Map<String, Long> stats = followService.getFollowerGenderStats(targetUserId);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "팔로워 성별 통계 조회 성공 🎉", stats));
+    }
+
+    @GetMapping("/followers/age-stats")
+    public ResponseEntity<CommonResponseDto<Map<Integer, Long>>> getFollowerAgeStats(@RequestParam("targetUserId") Long targetUserId) {
+
+        Map<Integer, Long> stats = followService.getFollowerAgeStats(targetUserId);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "팔로워 연령 통계 조회 성공 🎉", stats));
     }
 
 }

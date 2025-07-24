@@ -37,10 +37,16 @@ public class LikeController {
     @GetMapping("/{boardId}/likes")
     public ResponseEntity<CommonResponseDto<LikeResponseDto>> getLike(@PathVariable Long boardId,
                                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
         LikeResponseDto likeResponseDto = likeService.getLike(boardId, userDetails.getUser());
 
         return new ResponseEntity<>(new CommonResponseDto<>(200, boardId + "번 좋아요 조회에 성공하였습니다. 🎉", likeResponseDto), HttpStatus.OK);
+    }
+
+    @GetMapping("/{boardId}/likes/count")
+    public ResponseEntity<CommonResponseDto<Long>> getLikeCount(@PathVariable Long boardId) {
+        Long count = likeService.getLikeCount(boardId);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(200, "좋아요 수 조회 성공", count));
     }
 
 }
