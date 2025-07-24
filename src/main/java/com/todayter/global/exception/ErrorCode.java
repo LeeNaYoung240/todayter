@@ -27,6 +27,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(404, "이미 존재하는 이메일입니다."),
     NOT_ACCESS(404, "접근 권한이 없습니다."),
     ALREADY_ADMIN(404, "이미 관리자 권한을 가지고 있습니다."),
+    TOO_MANY_NICKNAME_CHANGES(404, "닉네임은 30일 내에 최대 3회까지 변경할 수 있습니다."),
 
     // board 관련 오류 처리
     BOARD_NOT_FOUND(404, "존재하지 않는 게시글입니다."),
@@ -58,7 +59,7 @@ public enum ErrorCode {
     FOLLOW_NOT_FOUND(404, "팔로우하고 있지 않습니다."),
     INVALID_PARENT_COMMENT(404, "부모 댓글이 해당 게시글에 속하지 않습니다."),
 
-    //s3
+    //s3 관련 오류 처리
     PUT_OBJECT_EXCEPTION(500, "s3 업로드에 문제가 발생했습니다."),
     FILE_NAME_INVALID(400, "잘못된 파일명입니다."),
     EXTENSION_IS_EMPTY(404, "파일을 찾을 수 없습니다."),
@@ -66,8 +67,9 @@ public enum ErrorCode {
     IO_EXCEPTION_ON_IMAGE_DELETE(404, "업로드에 문제가 발생했습니다."),
     NULL_MULTIPART_FILES_EXCEPTION(404, "파일 업로드 요청에서 파일이 포함되지 않았습니다. 파일을 선택하고 다시 시도하십시오."),
 
-    TOO_MANY_NICKNAME_CHANGES(404, "닉네임은 30일 내에 최대 3회까지 변경할 수 있습니다."),
-    ;
+    // cheer 관련 오류 처리
+    CANNOT_CHEER_YOURSELF(404, "본인은 응원할 수 없습니다."),
+    ALREADY_CHEERED_TODAY(404, "하루에 한 번 응원할 수 있습니다.");
 
     private int status;
     private String message;
