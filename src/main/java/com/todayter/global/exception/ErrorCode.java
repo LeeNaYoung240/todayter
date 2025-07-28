@@ -66,10 +66,11 @@ public enum ErrorCode {
     EXTENSION_INVALID(404, "잘못된 확장자명입니다."),
     IO_EXCEPTION_ON_IMAGE_DELETE(404, "업로드에 문제가 발생했습니다."),
     NULL_MULTIPART_FILES_EXCEPTION(404, "파일 업로드 요청에서 파일이 포함되지 않았습니다. 파일을 선택하고 다시 시도하십시오."),
+    FILE_NOT_FOUND(404, "파일을 찾을 수 없습니다."),
 
     // cheer 관련 오류 처리
     CANNOT_CHEER_YOURSELF(404, "본인은 응원할 수 없습니다."),
-    ALREADY_CHEERED_TODAY(404, "하루에 한 번 응원할 수 있습니다.");
+    ALREADY_CHEERED_TODAY(404, "하루에 한 번 응원할 수 있습니다."),;
 
     private int status;
     private String message;

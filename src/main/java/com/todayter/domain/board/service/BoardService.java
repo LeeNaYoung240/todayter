@@ -1,9 +1,12 @@
 package com.todayter.domain.board.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
 import com.todayter.domain.file.entity.File;
+import com.todayter.domain.file.repository.FileRepository;
 import com.todayter.domain.file.service.FileService;
 import com.todayter.domain.follow.repository.FollowRepository;
 import com.todayter.domain.user.entity.UserEntity;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final FileService fileService;
     private final FollowRepository followRepository;
+    private final FileRepository fileRepository;
 
     @Transactional
     public BoardResponseDto createBoard(UserEntity user, BoardRequestDto requestDto, List<MultipartFile> multipartFiles) {
@@ -65,16 +70,50 @@ public class BoardService {
 
     @Transactional
     public BoardResponseDto updateBoard(Long boardId, BoardUpdateRequestDto dto,
-                                        List<MultipartFile> newImages, UserEntity user) {
+                                        List<MultipartFile> newImages, String imageUrlsJson, UserEntity user) {
         Board board = boardRepository.findByIdWithUserAndFollowers(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
 
         validateUserMatch(board, user);
         board.update(dto);
 
-        if (newImages != null && !newImages.isEmpty()) {
-            List<File> newFiles = fileService.uploadFile(newImages);
-            board.getFiles().addAll(newFiles);
+        board.getFiles().clear();
+
+        List<String> imageUrls = new ArrayList<>();
+        if (imageUrlsJson != null && !imageUrlsJson.trim().isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                imageUrls = objectMapper.readValue(imageUrlsJson, new TypeReference<List<String>>(){});
+            } catch (Exception e) {
+                System.err.println("imageUrls JSON 파싱 실패: " + e.getMessage());
+            }
+        }
+
+        String content = dto.getContent();
+        if (content != null) {
+            java.util.regex.Pattern imagePattern = java.util.regex.Pattern.compile("!\\[([^\\]]*)\\]\\((https?://[^)]+)\\)");
+            java.util.regex.Matcher matcher = imagePattern.matcher(content);
+
+            int newImageIndex = 0;
+
+            while (matcher.find()) {
+                String imageUrl = matcher.group(2);
+
+                if (imageUrls.contains(imageUrl)) {
+                    File existingFile = fileRepository.findByFileUrl(imageUrl)
+                            .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
+                    board.getFiles().add(existingFile);
+                } else {
+                    if (newImages != null && newImageIndex < newImages.size()) {
+                        MultipartFile newImage = newImages.get(newImageIndex);
+                        List<File> uploadedFiles = fileService.uploadFile(java.util.Arrays.asList(newImage));
+                        if (!uploadedFiles.isEmpty()) {
+                            board.getFiles().add(uploadedFiles.get(0));
+                        }
+                        newImageIndex++;
+                    }
+                }
+            }
         }
 
         int followerCnt = followRepository.countByFollowing(board.getUser());

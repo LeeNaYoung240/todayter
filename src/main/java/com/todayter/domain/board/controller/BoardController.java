@@ -48,9 +48,10 @@ public class BoardController {
     public ResponseEntity<CommonResponseDto<BoardResponseDto>> updateBoard(@PathVariable Long boardId,
                                                                            @RequestPart("boardUpdateRequestDto") @Valid BoardUpdateRequestDto boardUpdateRequestDto,
                                                                            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+                                                                           @RequestPart(value = "imageUrls", required = false) String imageUrlsJson,
                                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        BoardResponseDto responseDto = boardService.updateBoard(boardId, boardUpdateRequestDto, images, userDetails.getUser());
+        BoardResponseDto responseDto = boardService.updateBoard(boardId, boardUpdateRequestDto, images, imageUrlsJson, userDetails.getUser());
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "게시글 수정에 성공하였습니다. 🎉", responseDto));
     }
