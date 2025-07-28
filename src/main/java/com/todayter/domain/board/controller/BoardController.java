@@ -215,4 +215,14 @@ public class BoardController {
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "인기 게시글 조회에 성공하였습니다. 🎉", new PageResponse<>(popularBoards)));
     }
 
+    @GetMapping("/author/{userId}")
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getBoardsByAuthor(@PathVariable Long userId,
+                                                                                               @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                                               @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        var result = boardService.getBoardsByAuthor(userId, page - 1, size);
+
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "기자별 기사 조회 성공", new PageResponse<>(result)));
+    }
+
 }

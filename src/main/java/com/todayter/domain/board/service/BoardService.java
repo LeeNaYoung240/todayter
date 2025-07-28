@@ -273,6 +273,16 @@ public class BoardService {
                 .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getBoardsByAuthor(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
+        Page<Board> boards = boardRepository.findAllByUser_Id(userId, pageable);
+
+        return boards.map(board ->
+                new BoardResponseDto(board, followRepository.countByFollowing(board.getUser()))
+        );
+    }
+
     public long getTotalBoardCnt() {
         return boardRepository.count();
     }
@@ -295,7 +305,6 @@ public class BoardService {
         boardRepository.deleteAllHourHits();
     }
 
-    // 미사용 시 제거 가능
     @Transactional(readOnly = true)
     public Board findById(Long boardId) {
         return boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));

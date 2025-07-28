@@ -55,4 +55,6 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
                 WHERE b.id = :boardId
             """)
     Optional<Board> findByIdWithUserAndFollowers(@Param("boardId") Long boardId);
+
+    Page<Board> findAllByUser_Id(Long userId, Pageable pageable);
 }
