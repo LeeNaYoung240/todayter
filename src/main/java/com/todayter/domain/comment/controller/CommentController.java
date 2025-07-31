@@ -1,5 +1,6 @@
 package com.todayter.domain.comment.controller;
 
+import com.todayter.domain.board.dto.PageResponse;
 import com.todayter.domain.comment.dto.CommentRequestDto;
 import com.todayter.domain.comment.dto.CommentResponseDto;
 import com.todayter.domain.comment.service.CommentFilterService;
@@ -43,11 +44,14 @@ public class CommentController {
 
 
     @GetMapping("/comments")
-    public ResponseEntity<CommonResponseDto<List<CommentResponseDto>>> getAllComments() {
-        List<CommentResponseDto> commentResponseDtos = commentService.getAllComments();
-
-        return new ResponseEntity<>(new CommonResponseDto<>(HttpStatus.OK.value(), "전체 댓글 조회에 성공하였습니다. 🎉", commentResponseDtos), HttpStatus.OK);
+    public ResponseEntity<CommonResponseDto<PageResponse<CommentResponseDto>>> getAllComments(@RequestParam(value = "page", defaultValue = "1") int page,
+                                                                                              @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                              @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy) {
+        var comments = commentService.getAllCommentsPaged(page - 1, size, sortBy);
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "전체 댓글 조회에 성공하였습니다. 🎉", new PageResponse<>(comments))
+        );
     }
+
 
     @PatchMapping("/comments/{commentId}")
     public ResponseEntity<CommonResponseDto> updateComment(@PathVariable Long commentId,

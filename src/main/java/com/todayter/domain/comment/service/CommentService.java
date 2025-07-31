@@ -12,6 +12,10 @@ import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.global.exception.CustomException;
 import com.todayter.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,12 +51,13 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDto> getAllComments() {
-        List<Comment> comments = commentRepository.findAll();
-        return comments.stream()
-                .map(CommentResponseDto::new)
-                .toList();
+    public Page<CommentResponseDto> getAllCommentsPaged(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+        Page<Comment> comments = commentRepository.findAll(pageable);
+
+        return comments.map(comment -> new CommentResponseDto(comment));
     }
+
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> getBoardComments(Long boardId, Long userId) {
