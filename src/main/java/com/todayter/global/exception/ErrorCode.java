@@ -70,7 +70,10 @@ public enum ErrorCode {
 
     // cheer 관련 오류 처리
     CANNOT_CHEER_YOURSELF(404, "본인은 응원할 수 없습니다."),
-    ALREADY_CHEERED_TODAY(404, "하루에 한 번 응원할 수 있습니다."),;
+    ALREADY_CHEERED_TODAY(404, "하루에 한 번 응원할 수 있습니다."),
+    INVALID_REQUEST_TITLE(404, "제목을 입력해 주세요."),
+    INVALID_REQUEST_CONTENT(404, "내용을 입력해 주세요.")
+    ;
 
     private int status;
     private String message;

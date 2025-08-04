@@ -34,6 +34,13 @@ public class BoardService {
 
     @Transactional
     public BoardResponseDto createBoard(UserEntity user, BoardRequestDto requestDto, List<MultipartFile> multipartFiles) {
+        if (requestDto.getTitle() == null || requestDto.getTitle().trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST_TITLE);
+        }
+        if (requestDto.getContent() == null || requestDto.getContent().trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST_CONTENT);
+        }
+
         Board.BoardType type = switch (requestDto.getCategory()) {
             case "지역별" -> Board.BoardType.LOCAL;
             case "분야별" -> Board.BoardType.SECTION;
