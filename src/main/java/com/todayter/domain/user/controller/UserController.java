@@ -51,7 +51,7 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<CommonResponseDto> signup(@RequestBody SignupRequestDto signupDto) {
+    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody SignupRequestDto signupDto) {
 
         userService.signup(signupDto);
 
