@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.todayter.domain.board.dto.*;
 import com.todayter.domain.board.entity.Board;
 import com.todayter.domain.board.repository.BoardRepository;
+import com.todayter.domain.comment.repository.CommentRepository;
 import com.todayter.domain.file.entity.File;
 import com.todayter.domain.file.repository.FileRepository;
 import com.todayter.domain.file.service.FileService;
 import com.todayter.domain.follow.repository.FollowRepository;
+import com.todayter.domain.like.repository.CommentLikeRepository;
+import com.todayter.domain.like.repository.LikeRepository;
 import com.todayter.domain.user.entity.UserEntity;
 import com.todayter.domain.user.entity.UserRoleEnum;
 import com.todayter.global.exception.CustomException;
@@ -31,6 +34,9 @@ public class BoardService {
     private final FileService fileService;
     private final FollowRepository followRepository;
     private final FileRepository fileRepository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public BoardResponseDto createBoard(UserEntity user, BoardRequestDto requestDto, List<MultipartFile> multipartFiles) {
@@ -171,8 +177,12 @@ public class BoardService {
 
     @Transactional
     public void deleteBoard(Long boardId, UserEntity user) {
-        Board board = findById(boardId); // 이건 사용 안 되면 제거해도 됨
+        Board board = findById(boardId);
         validateUserMatch(board, user);
+
+        commentLikeRepository.deleteAllByBoardId(boardId);
+        commentRepository.deleteAllByBoardId(boardId);
+        likeRepository.deleteAllByBoardId(boardId);
 
         for (File file : board.getFiles()) {
             fileService.deleteFile(file.getFileUrl());
