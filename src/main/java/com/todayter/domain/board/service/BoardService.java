@@ -193,7 +193,7 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Page<BoardSummaryDto> getBoardSummaries(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        return boardRepository.findAll(pageable).map(board ->
+        return boardRepository.findAllByApprovedTrue(pageable).map(board ->
                 new BoardSummaryDto(
                         board.getTitle(),
                         board.getSubTitle(),
@@ -223,7 +223,7 @@ public class BoardService {
                 : Sort.by(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return boardRepository.findAllByPickTrue(pageable)
+        return boardRepository.findAllByPickTrueAndApprovedTrue(pageable)
                 .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
@@ -251,12 +251,12 @@ public class BoardService {
 
         if ("지역별".equals(sectionType)) {
             boards = sectionName == null || sectionName.equals("ALL")
-                    ? boardRepository.findAllByType(Board.BoardType.LOCAL, pageable)
-                    : boardRepository.findAllByTypeAndRegion(Board.BoardType.LOCAL, sectionName, pageable);
+                    ? boardRepository.findAllByTypeAndApprovedTrue(Board.BoardType.LOCAL, pageable)
+                    : boardRepository.findAllByTypeAndRegionAndApprovedTrue(Board.BoardType.LOCAL, sectionName, pageable);
         } else if ("분야별".equals(sectionType)) {
             boards = sectionName == null || sectionName.equals("ALL")
-                    ? boardRepository.findAllByType(Board.BoardType.SECTION, pageable)
-                    : boardRepository.findAllByTypeAndSection(Board.BoardType.SECTION, sectionName, pageable);
+                    ? boardRepository.findAllByTypeAndApprovedTrue(Board.BoardType.SECTION, pageable)
+                    : boardRepository.findAllByTypeAndSectionAndApprovedTrue(Board.BoardType.SECTION, sectionName, pageable);
         } else if ("ALL".equalsIgnoreCase(sectionType)) {
             boards = boardRepository.findAll(pageable);
         } else {
@@ -276,14 +276,21 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Page<BoardResponseDto> searchBoards(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return boardRepository.findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(keyword, keyword, pageable)
+        return boardRepository.findByApprovedTrueAndTitleContainingIgnoreCaseOrApprovedTrueAndContentsContainingIgnoreCase(keyword, keyword, pageable)
                 .map(board -> new BoardResponseDto(board, followRepository.countByFollowing(board.getUser())));
     }
 
     @Transactional(readOnly = true)
-    public Page<BoardResponseDto> getBoardsByAuthor(Long userId, int page, int size) {
+    public Page<BoardResponseDto> getBoardsByAuthor(Long userId, int page, int size, UserEntity currentUser) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
-        Page<Board> boards = boardRepository.findAllByUser_Id(userId, pageable);
+        Page<Board> boards;
+
+        if (currentUser.isAdmin() || currentUser.getId().equals(userId)) {
+            boards = boardRepository.findAllByUser_Id(userId, pageable);
+        }
+        else {
+            boards = boardRepository.findAllByUser_IdAndApprovedTrue(userId, pageable);
+        }
 
         return boards.map(board ->
                 new BoardResponseDto(board, followRepository.countByFollowing(board.getUser()))

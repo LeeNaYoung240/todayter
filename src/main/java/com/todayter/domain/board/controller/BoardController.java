@@ -66,14 +66,15 @@ public class BoardController {
     }
 
     @GetMapping("/pick")
-    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page") int page,
-                                                                                          @RequestParam(value = "sortBy") String sortBy) {
+    public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getPickBoard(@RequestParam(value = "page", defaultValue = "1") int page,
+                                                                                          @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+                                                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        var boards = boardService.getPickedBoards(sortBy, page - 1, 5);
+        var boards = boardService.getPickedBoards(sortBy, page - 1, size);
 
-        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "Pick 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", new PageResponse<>(boards))
-        );
+        return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "Pick 게시글을 " + sortBy + " 순으로 조회에 성공하였습니다. 🎉", new PageResponse<>(boards)));
     }
+
 
     @GetMapping("/section")
     public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getSectionBoards(@RequestParam(value = "page") int page,
@@ -218,9 +219,10 @@ public class BoardController {
     @GetMapping("/author/{userId}")
     public ResponseEntity<CommonResponseDto<PageResponse<BoardResponseDto>>> getBoardsByAuthor(@PathVariable Long userId,
                                                                                                @RequestParam(value = "page", defaultValue = "1") int page,
-                                                                                               @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                                                               @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        var result = boardService.getBoardsByAuthor(userId, page - 1, size);
+        var result = boardService.getBoardsByAuthor(userId, page - 1, size, userDetails.getUser());
 
         return ResponseEntity.ok(new CommonResponseDto<>(HttpStatus.OK.value(), "기자별 기사 조회 성공", new PageResponse<>(result)));
     }

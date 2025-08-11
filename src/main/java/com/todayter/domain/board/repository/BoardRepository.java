@@ -21,14 +21,14 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
 
     long countByApprovedFalse();
 
-    Page<Board> findAllByType(Board.BoardType type, Pageable pageable);
+    Page<Board> findAllByTypeAndApprovedTrue(Board.BoardType type, Pageable pageable);
 
-    Page<Board> findAllByTypeAndRegion(Board.BoardType type, String region, Pageable pageable);
+    Page<Board> findAllByTypeAndRegionAndApprovedTrue(Board.BoardType type, String region, Pageable pageable);
 
-    Page<Board> findAllByTypeAndSection(Board.BoardType type, String section, Pageable pageable);
+    Page<Board> findAllByTypeAndSectionAndApprovedTrue(Board.BoardType type, String section, Pageable pageable);
 
 
-    Page<Board> findAllByPickTrue(Pageable pageable);
+    Page<Board> findAllByPickTrueAndApprovedTrue(Pageable pageable);
 
     Page<Board> findAll(Pageable pageable);
 
@@ -42,7 +42,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
     @Query("UPDATE Board s SET s.hourHits = s.hourHits + 1 WHERE s.id = :boardId")
     int updateHourHits(@Param("boardId") Long boardId);
 
-    Page<Board> findByTitleContainingIgnoreCaseOrContentsContainingIgnoreCase(String title, String contents, Pageable pageable);
+    Page<Board> findByApprovedTrueAndTitleContainingIgnoreCaseOrApprovedTrueAndContentsContainingIgnoreCase(String title, String contents, Pageable pageable);
 
     Page<Board> findAllByApprovedTrue(Pageable pageable);
 
@@ -57,4 +57,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardRespos
     Optional<Board> findByIdWithUserAndFollowers(@Param("boardId") Long boardId);
 
     Page<Board> findAllByUser_Id(Long userId, Pageable pageable);
+
+    Page<Board> findAllByUser_IdAndApprovedTrue(Long userId, Pageable pageable);
+
 }
