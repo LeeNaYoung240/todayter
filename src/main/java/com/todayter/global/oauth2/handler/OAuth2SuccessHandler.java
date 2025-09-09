@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +21,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
+
+    @Value("${app.oauth2.redirect-url:https://todayter.store/oauth2/redirect}")
+    private String oauth2RedirectUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -44,12 +47,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // 사용자 정보 포함한 redirect URL 생성
         String redirectUrl = String.format(
-                "http://localhost:3000/oauth2/redirect?access_token=%s&name=%s&email=%s&role=%s",
+                "%s?access_token=%s&name=%s&email=%s&role=%s",
+                oauth2RedirectUrl,
                 urlEncode(accessToken),
                 urlEncode(user.getNickname()),
                 urlEncode(user.getEmail()),
                 urlEncode(user.getRole().name())
         );
+
         response.sendRedirect(redirectUrl);
 
     }

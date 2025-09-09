@@ -111,3 +111,7 @@ server:
   port: 8081
   address: 0.0.0.0
   forward-headers-strategy: framework
+
+app:
+  oauth2:
+    redirect-url: ${APP_OAUTH2_REDIRECT_URL:https://todayter.store/oauth2/redirect}
