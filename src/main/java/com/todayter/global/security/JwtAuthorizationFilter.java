@@ -32,7 +32,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String tokenValue = jwtProvider.getAccessTokenFromHeader(request);
-        System.out.println("[JWT FILTER] token value = " + tokenValue); // 이 로그 확인!
+        //System.out.println("[JWT FILTER] token value = " + tokenValue); // 이 로그 확인!
 
         // 토큰이 있으면 → 인증 처리
         if (StringUtils.hasText(tokenValue)) {
