@@ -46,7 +46,9 @@ services:
     env_file:
       - .env
     environment:
+      - SERVER_FORWARD_HEADERS_STRATEGY=framework
       - JAVA_TOOL_OPTIONS=-Djdk.internal.platform.disableCgroupMemoryLimit=true
+      - APP_OAUTH2_REDIRECT_URL=https://todayter.store/oauth2/redirect
     expose:
       - "8081"
     networks:

@@ -89,6 +89,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
+                                "/login", "/login/**",
+                                "/oauth2/**",
+                                "/login/oauth2/code/**",
+                                "/oauth2/authorization/**",
+                                "/oauth2/redirect",
+
                                 "/api/cheers/count/**",
                                 "/api/follows/count",
                                 "/api/users/signup",
@@ -130,6 +136,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:8081");
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://todayter.store");
+        configuration.addAllowedOrigin("https://www.todayter.store");
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
