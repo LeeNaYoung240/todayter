@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +25,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.time.Duration;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -77,16 +81,22 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exception ->
-                        exception.authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setCharacterEncoding("UTF-8");
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.getWriter().write("{\"status\": 401, \"message\": \"인증이 필요합니다.\"}");
-                        })
-                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> {
+                    String origin = req.getHeader("Origin");
+                    if ("https://todayter.store".equals(origin) || "https://www.todayter.store".equals(origin)) {
+                        res.setHeader("Access-Control-Allow-Origin", origin);
+                        res.setHeader("Vary", "Origin");
+                        res.setHeader("Access-Control-Allow-Credentials", "true");
+                    }
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setCharacterEncoding("UTF-8");
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter().write("{\"status\":401,\"message\":\"인증이 필요합니다.\"}");
+                }))
+
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/login", "/login/**",
@@ -94,8 +104,6 @@ public class SecurityConfig {
                                 "/login/oauth2/code/**",
                                 "/oauth2/authorization/**",
                                 "/oauth2/redirect",
-                                "/api/upload-to-s3",
-
                                 "/api/cheers/count/**",
                                 "/api/follows/count",
                                 "/api/users/signup",
@@ -134,19 +142,27 @@ public class SecurityConfig {
     // Cors 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("http://localhost:*");
-        configuration.addAllowedOrigin("https://todayter.store");
-        configuration.addAllowedOrigin("https://www.todayter.store");
-        configuration.addAllowedOrigin("https://api.todayter.store");
+        CorsConfiguration cfg = new CorsConfiguration();
 
-        configuration.addExposedHeader("Authorization");
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        cfg.setAllowedOrigins(List.of(
+                "https://todayter.store",
+                "https://www.todayter.store"
+        ));
+        cfg.setAllowedOriginPatterns(List.of(
+                "http://localhost:*"
+        ));
+
+        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setExposedHeaders(List.of(
+                "Authorization","ETag","Location","x-amz-request-id","x-amz-version-id"
+        ));
+        cfg.setAllowCredentials(true);
+        cfg.setMaxAge(Duration.ofHours(1));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
+        source.registerCorsConfiguration("/**", cfg);
         return source;
     }
+
 }
