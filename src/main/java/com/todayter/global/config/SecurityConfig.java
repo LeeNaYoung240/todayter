@@ -94,6 +94,7 @@ public class SecurityConfig {
                                 "/login/oauth2/code/**",
                                 "/oauth2/authorization/**",
                                 "/oauth2/redirect",
+                                "/api/upload-to-s3",
 
                                 "/api/cheers/count/**",
                                 "/api/follows/count",
