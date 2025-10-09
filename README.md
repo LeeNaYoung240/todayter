@@ -140,6 +140,8 @@ ${\textsf{\color{teal}해당\ 프로젝트는\ 기획부터\ 설계,\ 개발,\ �
 
 <br>
 
+<div id="features">
+  
 # 🛫 Features
 
 <details>
@@ -194,6 +196,8 @@ ${\textsf{\color{teal}해당\ 프로젝트는\ 기획부터\ 설계,\ 개발,\ �
   - 구독자 통계(연령 / 성별 비율) 분석
 
 </details>
+
+<div id="features">
 
 
 <br>
