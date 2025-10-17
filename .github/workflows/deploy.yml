@@ -28,9 +28,9 @@ jobs:
           ./gradlew clean build -x test
           ls -al build/libs
 
-      # 4. 산출물(JAR) EC2로 업로드 (README 수정 시 건너뜀)
+     # 4. 산출물(JAR) EC2로 업로드 (README 수정 시 건너뜀)
       - name: Upload JAR to EC2
-        if: ${{ !contains(github.event.head_commit.message, 'readme') && secrets.EC2_HOST != '' }}
+        if: ${{ !contains(github.event.head_commit.message, 'readme') }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -40,9 +40,9 @@ jobs:
           target: "${{ secrets.EC2_PATH_BACKEND }}/build/libs"
           overwrite: true
 
-      # 5. EC2에서 컨테이너 재시작 (README 수정 시 건너뜀)
+     # 5. EC2에서 컨테이너 재시작 (README 수정 시 건너뜀)
       - name: Restart app container on EC2
-        if: ${{ !contains(github.event.head_commit.message, 'readme') && secrets.EC2_HOST != '' }}
+        if: ${{ !contains(github.event.head_commit.message, 'readme') }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -55,3 +55,4 @@ jobs:
             else
               docker-compose restart app || docker-compose up -d app
             fi
+
